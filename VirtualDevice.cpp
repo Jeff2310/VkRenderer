@@ -3,12 +3,20 @@
 //
 
 #include "VirtualDevice.h"
+#include "Rasterisation.h"
 
 namespace VkRenderer {
 
-    void VirtualDevice::drawPixel(int x, int y, float w, VkColor color){
-        if(w < zbuffer[y*width+x]) return;
-        zbuffer[y*width+x] = w;
+    void VirtualDevice::setBackgroundColor(float r, float g, float b){
+        glClearColor(r,g,b, 1.0f);
+        for(int i=0; i<width; i++){
+            for(int j=0; j<height; j++){
+                RasterlizePixel(*this, i, j, -1.0f, getColor(r, g, b, 1.0f));
+            }
+        }
+    }
+
+    void VirtualDevice::drawPixel(int x, int y, VkColor color){
         char r, g, b, a;
         r = (char)((color & 0xFF000000) >> 24),
         g = (char)((color & 0x00FF0000) >> 16),

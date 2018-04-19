@@ -14,13 +14,6 @@ namespace VkRenderer {
         T x,y,z;
     };
 
-    struct Line{
-        // 注意, Line的p1在下 p2在上
-        Point<float> p1, p2;
-        Line():p1{0.0f, 0.0f, 0.0f}, p2{0.0f, 0.0f, 0.0f}{}
-        Line(Point<float> _p1, Point<float> _p2):p1(_p1), p2(_p2){}
-    };
-
     // 列向量
     struct Vector {
         float x, y, z, w;
@@ -35,39 +28,39 @@ namespace VkRenderer {
             this->x = v.x; this->y = v.y, this->z = v.z, this->w = v.w;
         }
 
-        float length() {
+        float length() const{
             return sqrtf(x * x + y * y + z * z);
         }
 
-        Vector operator+(const Vector &v) {
+        Vector operator+(const Vector &v) const {
             Vector _v(x + v.x, y + v.y, z + v.z);
             return _v;
         }
 
-        Vector operator-(const Vector &v) {
+        Vector operator-(const Vector &v) const {
             Vector _v(x + v.x, y + v.y, z + v.z);
             return _v;
         }
 
-        Vector operator*(const float v){
+        Vector operator*(const float v) const {
             Vector _v(x*v, y*v, z*v);
             return _v;
         }
 
-        Vector operator/(const float v){
+        Vector operator/(const float v) const {
             Vector _v(x/v, y/v, z/v);
             return _v;
         }
 
-        Vector cross(const Vector &v) {
+        Vector cross(const Vector &v) const {
             Vector _v(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
             return _v;
         }
 
-        float dot(const Vector &v) {
+        float dot(const Vector &v) const {
             return x * v.x + y * v.y + z * v.z;
         }
-        Vector normalize(){
+        Vector normalize() const {
             Vector _v(*this);
             return _v/length();
         }
@@ -118,13 +111,23 @@ namespace VkRenderer {
             _v.w = v.x * value[3][0] + v.y * value[3][1] + v.z * value[3][2] + v.w * value[3][3];
             return _v;
         }
+
+        Matrix inverse();
+
+        Matrix transpose();
     };
 
     float interp(float x1, float x2, float t);
     Vector interp(const Vector &v1, const Vector& v2, float t);
     Matrix identityMatrix();
     Matrix translate(float x, float y, float z);
+    Matrix translate(const Vector& pos);
     Matrix scale(float tx, float ty, float tz);
-    Matrix rotate(float angle, Vector v);
+    Matrix rotate(float angle, const Vector& v);
+    Matrix getView(const Vector& eyePos, const Vector& direction);
+    Matrix getView(const Vector& eyePos, const Vector& direction, const Vector& up);
+    Matrix lookAt(const Vector& eyePos, const Vector& lookPos);
+    Matrix lookAt(const Vector& eyePos, const Vector& lookPos, const Vector& up);
+    Matrix getPerspective(float fov, float near, float far);
 }
 #endif //VKSOFTWARERENDER_MATHUTILITY_H

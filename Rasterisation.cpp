@@ -22,117 +22,125 @@ namespace VkRenderer{
     }
 
     int DivideTriangle(SubTriangle *result, Triangle t){
-        Point<float> *p1=&t.p1, *p2=&t.p2, *p3=&t.p3;
-        Point<float> *p;
+        Vertex *p1=&t.p1, *p2=&t.p2, *p3=&t.p3;
+        Vertex *p;
         // p1 p2 p3按y从小到大排列
-        if(p1->y > p2->y) p = p1, p1 = p2, p2 = p;
-        if(p1->y > p3->y) p = p1, p1 = p3, p3 = p;
-        if(p2->y > p3->y) p = p2, p2 = p3, p3 = p;
+        if(p1->pos.y > p2->pos.y) p = p1, p1 = p2, p2 = p;
+        if(p1->pos.y > p3->pos.y) p = p1, p1 = p3, p3 = p;
+        if(p2->pos.y > p3->pos.y) p = p2, p2 = p3, p3 = p;
         // 退化成直线
-        if(p1->y == p2->y && p1->y == p3->y) return 0;
-        if(p1->x == p2->x && p1->x == p3->x) return 0;
-        // 平底三角形
+        if(p1->pos.y == p2->pos.y && p1->pos.y == p3->pos.y) return 0;
+        if(p1->pos.x == p2->pos.x && p1->pos.x == p3->pos.x) return 0;
 
-        Point<float> _p1, _p2, _p3;
-        
-        if(p1->y == p2->y){
-            if(p1->x > p2->x){
+
+        //Vertex _p1, _p2, _p3;
+        // 平底三角形
+        if(p1->pos.y == p2->pos.y){
+            if(p1->pos.x > p2->pos.x){
                 p = p1, p1 = p2, p2 = p;
             }
-            _p1=*p1 , _p2=*p2, _p3=*p3;
-            result[0].bottom = p1->y;
-            result[0].top = p3->y;
-            result[0].left = Line(_p1, _p3);
-            result[0].right = Line(_p2, _p3);
+            result[0].bottom = p1->pos.y;
+            result[0].top = p3->pos.y;
+            result[0].left = Line(*p1, *p3);
+            result[0].right = Line(*p2, *p3);
             return 1;
-        }else if(p2->y == p3->y){
-            if(p2->x > p3->x){
+        }else if(p2->pos.y == p3->pos.y){
+            if(p2->pos.x > p3->pos.x){
                 p = p2, p2 = p3, p3 = p;
             }
-            _p1=*p1 , _p2=*p2, _p3=*p3;
-            result[0].bottom = p1->y;
-            result[0].top = p3->y;
-            result[0].left = Line(_p1, _p2);
-            result[0].right = Line(_p1, _p3);
+            result[0].bottom = p1->pos.y;
+            result[0].top = p3->pos.y;
+            result[0].left = Line(*p1, *p2);
+            result[0].right = Line(*p1, *p3);
             return 1;
         }else{ //普通三角形
-            _p1=*p1 , _p2=*p2, _p3=*p3;
-            result[0].bottom = p1->y;
-            result[0].top = result[1].bottom = p2->y;
-            result[1].top = p3->y;
+            result[0].bottom = p1->pos.y;
+            result[0].top = result[1].bottom = p2->pos.y;
+            result[1].top = p3->pos.y;
             //插值获得p2在线段p1p3上的投影点
-            float k = (p2->y - p1->y)/(p3->y - p1->y);
-            float x = interp(p1->x, p3->x, k);
-            Point<float> _p0 {x, p2->y};
+            float k = (p2->pos.y - p1->pos.y)/(p3->pos.y - p1->pos.y);
+            Vertex _p0 = interp(*p1, *p3, k);
             // p2在p0左侧
-            if(_p2.x <= _p0.x){
-                result[0].left = Line(_p1, _p2);
-                result[0].right = Line(_p1, _p0);
-                result[1].left = Line(_p2, _p3);
-                result[1].right = Line(_p0, _p3);
+            if(p2->pos.x <= _p0.pos.x){
+                result[0].left = Line(*p1, *p2);
+                result[0].right = Line(*p1, _p0);
+                result[1].left = Line(*p2, *p3);
+                result[1].right = Line(_p0, *p3);
             }else{
-                result[0].left = Line(_p1, _p0);
-                result[0].right = Line(_p1, _p2);
-                result[1].left = Line(_p0, _p3);
-                result[1].right = Line(_p2, _p3);
+                result[0].left = Line(*p1, _p0);
+                result[0].right = Line(*p1, *p2);
+                result[1].left = Line(_p0, *p3);
+                result[1].right = Line(*p2, *p3);
             }
         }
         return 2;
     }
 
+    // todo: 根据SubTriangle上下顶点信息插值得到扫描线左右两端信息;
     Scanline generateScanline(const SubTriangle& t, int y){
         Scanline _scanline;
-        _scanline.y = y;
-        int left,right;
         float top, bottom, k;
-        top = t.left.p2.y;
-        bottom = t.left.p1.y;
+        Vertex _v;
+
+        _scanline.y = y;
+
+        top = t.left.p2.pos.y;
+        bottom = t.left.p1.pos.y;
         k = ((float)y-bottom)/(top-bottom);
-        left = (int)lround(interp(t.left.p1.x, t.left.p2.x, k));
-        top = t.right.p2.y;
-        bottom = t.right.p1.y;
+        _scanline.lvertex = interp(t.left.p1, t.left.p2, k);
+        _scanline.left = (int)lround(_scanline.lvertex.pos.x);
+
+        top = t.right.p2.pos.y;
+        bottom = t.right.p1.pos.y;
         k = ((float)y-bottom)/(top-bottom);
-        right = (int)lround(interp(t.right.p1.x, t.right.p2.x, k));
-        _scanline.left = left;
-        _scanline.width = right-left;
-        //_scanline.left = (int)lround(t.left.p1.x);
-        //_scanline.width = (int)lround(t.right.p1.x) - _scanline.left;
+        _scanline.rvertex = interp(t.right.p1, t.right.p2, k);
+        _scanline.right = (int)lround(_scanline.rvertex.pos.x);
         return _scanline;
     }
 
-    void RenderScanline(VirtualDevice& device, const Scanline& scanline, float w, VkColor color){
+    void RasterlizeScanline(VirtualDevice &device, const Scanline &scanline, VkColor color){
         int screenWidth = device.getWidth();
-        for(int x=scanline.left; x<=scanline.left+scanline.width; x++){
+        int left=scanline.left, right=scanline.right;
+        Vertex fragment;
+        float k;
+        for(int x=left; x<=right; x++){
             if(x>=0 && x<screenWidth){
-                // z-buffer required
-                // for debug
-                device.drawPixel(x, scanline.y, w, color);
+                k=(float)(x-left)/(right-left);
+                // 扫描线两端定点插值得到fragment
+                fragment = interp(scanline.lvertex, scanline.rvertex, k);
+                VkColor _color = device.getColor(fragment.color.r, fragment.color.g, fragment.color.b, fragment.color.w);
+                RasterlizePixel(device, x, scanline.y, fragment.pos.z, _color);
             }
         }
     }
 
-    void RenderTriangle(VirtualDevice& screen, const Triangle& t, float w, VkColor color){
+    void RasterlizeTriangle(VirtualDevice &screen, const Triangle &t, VkColor color){
         SubTriangle result[2];
         int count = DivideTriangle(result, t);
         if(count==0){
-
+            return;
         }else{
             //cout<<count;
             for(int i=0; i<count; i++){
                 for(int y=(int)lround(result[i].bottom); y<=(int)lround(result[i].top); y++){
                     if(y<0 || y>screen.getHeight()) return;
                     Scanline s = generateScanline(result[i], y);
-                    RenderScanline(screen, s, w, color);
+                    RasterlizeScanline(screen, s, color);
                 }
             }
         }
     }
 
-    void RenderPixel(VirtualDevice& device, int x, int y, float w, VkColor color){
-        device.drawPixel(x, y, w, color);
+    void RasterlizePixel(VirtualDevice &device, int x, int y, float z, VkColor color){
+        float *pixelDepth = device.getDepth(x,y);
+        float depth = 1/z;
+        if(depth < *pixelDepth)
+            return;
+        *pixelDepth = depth;
+        device.drawPixel(x, y, color);
     }
 
-    void RenderLine(VirtualDevice& device, int x1, int y1, int x2, int y2, float w, VkColor color){
+    void RasterlizeLine(VirtualDevice &device, int x1, int y1, int x2, int y2, float z, VkColor color){
         /* 假设dx>dy
          * m=dy/dx为斜率, e为到该画的点为止之前的积累误差
          * e+=dy/dx    --> 2*dx*e+=2*dy
@@ -148,15 +156,15 @@ namespace VkRenderer{
         int e, d;
 
         if (x1 == x2 && y1 == y2) {
-            device.drawPixel(x1, y1, w, color);
+            RasterlizePixel(device, x1, y1, z, color);
             return;
         } else if (x1 == x2) {
-            for (y = y1; y != y2; y += (y1 < y2 ? 1 : -1)) device.drawPixel(x1, y, w, color);
-            device.drawPixel(x2, y2, w, color);
+            for (y = y1; y != y2; y += (y1 < y2 ? 1 : -1)) RasterlizePixel(device, x1, y, z, color);
+            RasterlizePixel(device, x2, y2, z, color);
             return;
         } else if (y1 == y2) {
-            for (x = x1; x != x2; x += (x1 < x2 ? 1 : -1)) device.drawPixel(x, y1, w, color);
-            device.drawPixel(x2, y2, w, color);
+            for (x = x1; x != x2; x += (x1 < x2 ? 1 : -1)) RasterlizePixel(device, x, y1, z, color);
+            RasterlizePixel(device, x2, y2, z, color);
             return;
         }
 
@@ -164,8 +172,9 @@ namespace VkRenderer{
         int dy = y1 > y2 ? y1 - y2 : y2 - y1;
         //判断直线斜率（绝对值）
         if (dx == dy) {
-            for (x = x1, y = y1; x != x2; x += (x1 < x2 ? 1 : -1), y += (y1 < y2 ? 1 : -1)) device.drawPixel(x, y, w, color);
-            device.drawPixel(x2, y2, w, color);
+            for (x = x1, y = y1; x != x2; x += (x1 < x2 ? 1 : -1), y += (y1 < y2 ? 1 : -1))
+                RasterlizePixel(device, x, y, z, color);
+            RasterlizePixel(device, x2, y2, z, color);
         } else if (dx > dy) {
             if (x1 > x2) {
                 t = x1, x1 = x2, x2 = t;
@@ -173,7 +182,7 @@ namespace VkRenderer{
             }
             e = -2 * dy, d = 2 * dy - dx;
             for (x = x1, y = y1; x <= x2; x++) {
-                device.drawPixel(x, y, w, color);
+                RasterlizePixel(device, x, y, z, color);
                 e += 2 * dy;
                 if (e + d > 0) y += (y1 < y2 ? 1 : -1), e -= 2 * dx;
             }
@@ -184,7 +193,7 @@ namespace VkRenderer{
             }
             e = -2 * dx, d = 2 * dx - dy;
             for (x = x1, y = y1; y <= y2; y++) {
-                device.drawPixel(x, y, w, color);
+                RasterlizePixel(device, x, y, z, color);
                 e += 2 * dx;
                 if (e + d > 0) x += (x1 < x2 ? 1 : -1), e -= 2 * dy;
             }

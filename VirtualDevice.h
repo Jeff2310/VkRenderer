@@ -53,6 +53,13 @@ namespace VkRenderer {
         }
         int getWidth() const { return width; }
         int getHeight() const { return height; }
+        VkFloat* getDepth(int x, int y){
+            return &zbuffer[y*width+x];
+        }
+
+        bool shouldShutdown(){
+            return (bool)glfwWindowShouldClose(window);
+        }
 
         VkColor getColor(float r, float g, float b, float a){
             VkColor color = 0;
@@ -65,21 +72,16 @@ namespace VkRenderer {
             return color;
         }
 
-        void setBackgroundColor(float r, float g, float b){
-            glClearColor(r,g,b, 1.0f);
-            for(int i=0; i<width; i++){
-                for(int j=0; j<height; j++){
-                    drawPixel(i,j, -1.0f, getColor(r, g, b, 1.0f));
-                }
-            }
-        }
+        void setBackgroundColor(float r, float g, float b);
+
         void refreshBuffer(){
             glClear(GL_COLOR_BUFFER_BIT);
             glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_BYTE, framebuffer);
             glfwSwapBuffers(window);
+            glfwPollEvents();
         }
 
-        void drawPixel(int x, int y, float w, VkColor color);
+        void drawPixel(int x, int y, VkColor color);
     };
 }
 
