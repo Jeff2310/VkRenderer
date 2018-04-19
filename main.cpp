@@ -1,54 +1,38 @@
-#include <iostream>
-#include <iomanip>
-#include "VirtualScreen.h"
-#include "MathUtility.h"
 #include "Rasterisation.h"
-#include <glm/gtc/matrix_transform.hpp>
+#include "VirtualDevice.h"
 
 using namespace VkRenderer;
 
 using namespace std;
 
 int main() {
-    VirtualScreen screen("test", 160, 80);
 
-    for(int i=0; i<160; i++){
-        for(int j=0; j<80; j++){
-            screen.DrawPixel(i,j,' ');
-        }
-    }
+    VirtualDevice device("test", 400, 400);
+    VkRenderer::VkColor white = device.getColor(1.0f, 1.0f, 1.0f, 1.0f);
+    VkRenderer::VkColor black = device.getColor(0.0f, 0.0f, 0.0f, 1.0f);
+    VkRenderer::VkColor mixed = device.getColor(1.0f, 0.0f, 0.0f, 1.0f);
+    VkRenderer::VkColor blue = device.getColor(0.0f, 1.0f, 0.0f, 1.0f);
+
 
     Triangle t;
-    t.p1 = Point<float>{80.0f, 15.0f, 0.0f};
-    t.p2 = Point<float>{5.0f, 8.0f, 0.0f};
-    t.p3 = Point<float>{45.0f, 50.0f, 0.0f};
+    t.p1 = Point<float>{160.0f, 350.0f, 0.0f};
+    t.p2 = Point<float>{45.0f, 30.0f, 0.0f};
+    t.p3 = Point<float>{380.0f, 100.0f, 0.0f};
 
-    Triangle t2;
-    t2.p1 = Point<float>{70.0f, 55.0f, 0.0f};
-    t2.p2 = Point<float>{180.0f, 55.0f, 0.0f};
-    t2.p3 = Point<float>{85.0f, 70.0f, 0.0f};
+    Triangle v;
+    v.p1 = Point<float>{40.0f, 280.0f, 0.0f};
+    v.p2 = Point<float>{265.0f, 30.0f, 0.0f};
+    v.p3 = Point<float>{350.0f, 360.0f, 0.0f};
 
-    Triangle t3;
-    t3.p1 = Point<float>{70.0f, 40.0f, 0.0f};
-    t3.p2 = Point<float>{120.0f, 40.0f, 0.0f};
-    t3.p3 = Point<float>{85.0f, 25.0f, 0.0f};
+    device.setBackgroundColor(0.3f, 0.58f, 0.80f);
 
+    RenderTriangle(device, t, 0.5f, mixed);
+    RenderTriangle(device, v, 0.6f, blue);
 
-    Triangle t4;
-    t4.p1 = Point<float>{75.0f, 65.0f, 0.0f};
-    t4.p2 = Point<float>{5.0f, 75.0f, 0.0f};
-    t4.p3 = Point<float>{45.0f, 55.0f, 0.0f};
+    RenderLine(device, 40, 80, 350, 240, 0.55f, black);
 
-    RenderTriangle(screen, t);
-    RenderTriangle(screen, t2);
-    RenderTriangle(screen, t3);
-    RenderTriangle(screen, t4);
+    device.refreshBuffer();
 
-    screen.DrawLine(0,0,159,0,'-');
-    screen.DrawLine(0,79,159,79,'-');
-    screen.DrawLine(0,1,0,78,'|');
-    screen.DrawLine(159,1,159,78,'|');
-
-    screen.Dump("screen_test");
+    system("read -n1 -r -p \"Press any key to continue...\" key");
     return 0;
 }

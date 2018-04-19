@@ -4,6 +4,7 @@
 
 #include "MathUtility.h"
 #include "Rasterisation.h"
+#include "VirtualDevice.h"
 
 namespace VkRenderer{
 
@@ -99,18 +100,18 @@ namespace VkRenderer{
         return _scanline;
     }
 
-    void RenderScanline(VirtualScreen& screen, const Scanline& scanline){
-        int screenWidth = screen.getWidth();
+    void RenderScanline(VirtualDevice& device, const Scanline& scanline, float w, VkColor color){
+        int screenWidth = device.getWidth();
         for(int x=scanline.left; x<=scanline.left+scanline.width; x++){
             if(x>=0 && x<screenWidth){
                 // z-buffer required
                 // for debug
-                screen.DrawPixel(x, scanline.y, '1');
+                device.drawPixel(x, scanline.y, w, color);
             }
         }
     }
 
-    void RenderTriangle(VirtualScreen& screen, const Triangle& t){
+    void RenderTriangle(VirtualDevice& screen, const Triangle& t, float w, VkColor color){
         SubTriangle result[2];
         int count = DivideTriangle(result, t);
         if(count==0){
@@ -119,11 +120,73 @@ namespace VkRenderer{
             //cout<<count;
             for(int i=0; i<count; i++){
                 for(int y=(int)lround(result[i].bottom); y<=(int)lround(result[i].top); y++){
-                    cout<<y<<endl;
                     if(y<0 || y>screen.getHeight()) return;
                     Scanline s = generateScanline(result[i], y);
-                    RenderScanline(screen, s);
+                    RenderScanline(screen, s, w, color);
                 }
+            }
+        }
+    }
+
+    void RenderPixel(VirtualDevice& device, int x, int y, float w, VkColor color){
+        device.drawPixel(x, y, w, color);
+    }
+
+    void RenderLine(VirtualDevice& device, int x1, int y1, int x2, int y2, float w, VkColor color){
+        /* 假设dx>dy
+         * m=dy/dx为斜率, e为到该画的点为止之前的积累误差
+         * e+=dy/dx    --> 2*dx*e+=2*dy
+         * 若e+dy/dx>0.5   --> 2*dx*e+2*dy-dx>0
+         * 则y+=1, e-=1
+         *
+         * 作代换u=2*dx*e; D=2*dy-dx;
+         * u+=2*dy
+         * 若u+D>0
+         * 则y+=1, u-=2*dx
+         */
+        int x, y, t;
+        int e, d;
+
+        if (x1 == x2 && y1 == y2) {
+            device.drawPixel(x1, y1, w, color);
+            return;
+        } else if (x1 == x2) {
+            for (y = y1; y != y2; y += (y1 < y2 ? 1 : -1)) device.drawPixel(x1, y, w, color);
+            device.drawPixel(x2, y2, w, color);
+            return;
+        } else if (y1 == y2) {
+            for (x = x1; x != x2; x += (x1 < x2 ? 1 : -1)) device.drawPixel(x, y1, w, color);
+            device.drawPixel(x2, y2, w, color);
+            return;
+        }
+
+        int dx = x1 > x2 ? x1 - x2 : x2 - x1;
+        int dy = y1 > y2 ? y1 - y2 : y2 - y1;
+        //判断直线斜率（绝对值）
+        if (dx == dy) {
+            for (x = x1, y = y1; x != x2; x += (x1 < x2 ? 1 : -1), y += (y1 < y2 ? 1 : -1)) device.drawPixel(x, y, w, color);
+            device.drawPixel(x2, y2, w, color);
+        } else if (dx > dy) {
+            if (x1 > x2) {
+                t = x1, x1 = x2, x2 = t;
+                t = y1, y1 = y2, y2 = t;
+            }
+            e = -2 * dy, d = 2 * dy - dx;
+            for (x = x1, y = y1; x <= x2; x++) {
+                device.drawPixel(x, y, w, color);
+                e += 2 * dy;
+                if (e + d > 0) y += (y1 < y2 ? 1 : -1), e -= 2 * dx;
+            }
+        } else {
+            if (y1 > y2) {
+                t = x1, x1 = x2, x2 = t;
+                t = y1, y1 = y2, y2 = t;
+            }
+            e = -2 * dx, d = 2 * dx - dy;
+            for (x = x1, y = y1; y <= y2; y++) {
+                device.drawPixel(x, y, w, color);
+                e += 2 * dx;
+                if (e + d > 0) x += (x1 < x2 ? 1 : -1), e -= 2 * dy;
             }
         }
     }

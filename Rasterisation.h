@@ -7,6 +7,7 @@
 
 #include "MathUtility.h"
 #include "VirtualScreen.h"
+#include "VirtualDevice.h"
 
 namespace VkRenderer {
 
@@ -47,9 +48,13 @@ namespace VkRenderer {
 
     Scanline generateScanline(const SubTriangle& t, int y);
 
-    void RenderScanline(VirtualScreen& screen, const Scanline& scanline);
+    void RenderScanline(VirtualDevice& device, const Scanline& scanline, float w, VkColor color);
 
-    void RenderTriangle(VirtualScreen& screen, const Triangle& t);
+    void RenderTriangle(VirtualDevice& device, const Triangle& t, float w, VkColor color);
+
+    void RenderPixel(VirtualDevice& device, int x, int y, float w, VkColor color);
+
+    void RenderLine(VirtualDevice& device, int x1, int y1, int x2, int y2, float w, VkColor color);
 }
 
 #endif //VKSOFTWARERENDER_RASTERISATION_H
