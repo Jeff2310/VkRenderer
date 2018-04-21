@@ -20,24 +20,27 @@ namespace VkRenderer {
     public:
         Transform static currentTransform;
 
-        Transform(){
-            _model = _view = _projection = _summary = identityMatrix();
-        }
-        Transform(const Matrix& model, const Matrix& view, const Matrix& projection){
-            _model = model;
-            _view = view;
-            _projection = projection;
-            _summary = _projection * _view * _model;
-        }
-        void setModel(const Matrix& model);
-        void setView(const Matrix& view);
-        void setProjection(const Matrix& projection);
+        Transform();
+
+        Transform(const Matrix &model, const Matrix &view, const Matrix &projection);
+
+        void setModel(const Matrix &model);
+
+        void setView(const Matrix &view);
+
+        void setProjection(const Matrix &projection);
+
         Matrix getModel();
-        Vector applyTransform(const Vector& v);
-        void bindTransform(const Transform& t);
+
+        Vector applyTransform(const Vector &v);
+
     };
 
-    void RenderTriangle(VirtualDevice &screen, const Triangle &t, float z, VkColor color);
+    void bindTransform(const Transform &t);
+
+    Vector homogenize(VirtualDevice &device, const Vector &v);
+
+    void RenderTriangle(VirtualDevice &device, const Triangle &t);
 }
 
 #endif //VKSOFTWARERENDER_GEOMETRYSTAGE_H

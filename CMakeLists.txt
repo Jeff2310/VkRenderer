@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 project(VkSoftwareRender)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
 #设置GLFW库的头文件目录
 set(GLFW3_INCLUDE_DIR /include/GLFW)
@@ -32,9 +33,9 @@ include_directories( ${SUMMARY_DEBUG_INCLUDE} )
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB CURRENT_SOURCES  *.cpp)
 #为头文件和源文件进行分组
-source_group("Include" FILES ${CURRENT_HEADERS})
-source_group("Source" FILES ${CURRENT_SOURCES})
+#source_group("Include" FILES ${CURRENT_HEADERS})
+#source_group("Source" FILES ${CURRENT_SOURCES})
 
-add_executable(main_project ${CURRENT_HEADERS} ${CURRENT_SOURCES})
+add_executable(VkSoftwareRender ${CURRENT_HEADERS} ${CURRENT_SOURCES})
 #设置项目的外部依赖库
-target_link_libraries(main_project  -lglfw -lGLEW -lGLU -lGL)
+target_link_libraries(VkSoftwareRender  -lglfw -lGLEW -lGLU -lGL)

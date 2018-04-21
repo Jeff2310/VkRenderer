@@ -4,7 +4,6 @@
 
 #include "MathUtility.h"
 #include "Rasterisation.h"
-#include "VirtualDevice.h"
 
 namespace VkRenderer{
 
@@ -76,71 +75,71 @@ namespace VkRenderer{
         return 2;
     }
 
-    // todo: 根据SubTriangle上下顶点信息插值得到扫描线左右两端信息;
     Scanline generateScanline(const SubTriangle& t, int y){
         Scanline _scanline;
         float top, bottom, k;
-        Vertex _v;
 
         _scanline.y = y;
 
-        top = t.left.p2.pos.y;
-        bottom = t.left.p1.pos.y;
+        top = lround(t.left.p2.pos.y);
+        bottom = lround(t.left.p1.pos.y);
         k = ((float)y-bottom)/(top-bottom);
         _scanline.lvertex = interp(t.left.p1, t.left.p2, k);
         _scanline.left = (int)lround(_scanline.lvertex.pos.x);
 
-        top = t.right.p2.pos.y;
-        bottom = t.right.p1.pos.y;
+        top = lround(t.right.p2.pos.y);
+        bottom = lround(t.right.p1.pos.y);
         k = ((float)y-bottom)/(top-bottom);
         _scanline.rvertex = interp(t.right.p1, t.right.p2, k);
         _scanline.right = (int)lround(_scanline.rvertex.pos.x);
         return _scanline;
     }
 
-    void RasterlizeScanline(VirtualDevice &device, const Scanline &scanline, VkColor color){
+    void RasterizeScanline(VirtualDevice &device, const Scanline &scanline) {
         int screenWidth = device.getWidth();
         int left=scanline.left, right=scanline.right;
         Vertex fragment;
         float k;
+#pragma omp parallel for
         for(int x=left; x<=right; x++){
             if(x>=0 && x<screenWidth){
                 k=(float)(x-left)/(right-left);
                 // 扫描线两端定点插值得到fragment
                 fragment = interp(scanline.lvertex, scanline.rvertex, k);
                 VkColor _color = device.getColor(fragment.color.r, fragment.color.g, fragment.color.b, fragment.color.w);
-                RasterlizePixel(device, x, scanline.y, fragment.pos.z, _color);
+                RasterizePixel(device, x, scanline.y, fragment.pos.z, _color);
             }
         }
     }
 
-    void RasterlizeTriangle(VirtualDevice &screen, const Triangle &t, VkColor color){
+    void RasterizeTriangle(VirtualDevice &screen, const Triangle &t) {
         SubTriangle result[2];
         int count = DivideTriangle(result, t);
         if(count==0){
             return;
         }else{
-            //cout<<count;
             for(int i=0; i<count; i++){
-                for(int y=(int)lround(result[i].bottom); y<=(int)lround(result[i].top); y++){
-                    if(y<0 || y>screen.getHeight()) return;
+#pragma omp parallel for
+                for (auto y = (int) lround(result[i].bottom); y < (int) lround(result[i].top); y++) {
+                    if(y<0 || y>screen.getHeight()) continue;// damn it
                     Scanline s = generateScanline(result[i], y);
-                    RasterlizeScanline(screen, s, color);
+                    RasterizeScanline(screen, s);
                 }
             }
         }
     }
 
-    void RasterlizePixel(VirtualDevice &device, int x, int y, float z, VkColor color){
+    void RasterizePixel(VirtualDevice &device, int x, int y, float z, VkColor color) {
+        if(x<0||x>=device.getWidth()||y<0||y>=device.getHeight()) return;
         float *pixelDepth = device.getDepth(x,y);
-        float depth = 1/z;
-        if(depth < *pixelDepth)
+        float depth = z;
+        if (depth < 0.0f || depth > 1.0f || depth > *pixelDepth)
             return;
         *pixelDepth = depth;
         device.drawPixel(x, y, color);
     }
 
-    void RasterlizeLine(VirtualDevice &device, int x1, int y1, int x2, int y2, float z, VkColor color){
+    void RasterizeLine(VirtualDevice &device, int x1, int y1, int x2, int y2, float z, VkColor color) {
         /* 假设dx>dy
          * m=dy/dx为斜率, e为到该画的点为止之前的积累误差
          * e+=dy/dx    --> 2*dx*e+=2*dy
@@ -156,15 +155,15 @@ namespace VkRenderer{
         int e, d;
 
         if (x1 == x2 && y1 == y2) {
-            RasterlizePixel(device, x1, y1, z, color);
+            RasterizePixel(device, x1, y1, z, color);
             return;
         } else if (x1 == x2) {
-            for (y = y1; y != y2; y += (y1 < y2 ? 1 : -1)) RasterlizePixel(device, x1, y, z, color);
-            RasterlizePixel(device, x2, y2, z, color);
+            for (y = y1; y != y2; y += (y1 < y2 ? 1 : -1)) RasterizePixel(device, x1, y, z, color);
+            RasterizePixel(device, x2, y2, z, color);
             return;
         } else if (y1 == y2) {
-            for (x = x1; x != x2; x += (x1 < x2 ? 1 : -1)) RasterlizePixel(device, x, y1, z, color);
-            RasterlizePixel(device, x2, y2, z, color);
+            for (x = x1; x != x2; x += (x1 < x2 ? 1 : -1)) RasterizePixel(device, x, y1, z, color);
+            RasterizePixel(device, x2, y2, z, color);
             return;
         }
 
@@ -173,8 +172,8 @@ namespace VkRenderer{
         //判断直线斜率（绝对值）
         if (dx == dy) {
             for (x = x1, y = y1; x != x2; x += (x1 < x2 ? 1 : -1), y += (y1 < y2 ? 1 : -1))
-                RasterlizePixel(device, x, y, z, color);
-            RasterlizePixel(device, x2, y2, z, color);
+                RasterizePixel(device, x, y, z, color);
+            RasterizePixel(device, x2, y2, z, color);
         } else if (dx > dy) {
             if (x1 > x2) {
                 t = x1, x1 = x2, x2 = t;
@@ -182,7 +181,7 @@ namespace VkRenderer{
             }
             e = -2 * dy, d = 2 * dy - dx;
             for (x = x1, y = y1; x <= x2; x++) {
-                RasterlizePixel(device, x, y, z, color);
+                RasterizePixel(device, x, y, z, color);
                 e += 2 * dy;
                 if (e + d > 0) y += (y1 < y2 ? 1 : -1), e -= 2 * dx;
             }
@@ -193,7 +192,7 @@ namespace VkRenderer{
             }
             e = -2 * dx, d = 2 * dx - dy;
             for (x = x1, y = y1; y <= y2; y++) {
-                RasterlizePixel(device, x, y, z, color);
+                RasterizePixel(device, x, y, z, color);
                 e += 2 * dx;
                 if (e + d > 0) x += (x1 < x2 ? 1 : -1), e -= 2 * dy;
             }

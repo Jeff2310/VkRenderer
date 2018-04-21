@@ -10,10 +10,6 @@
 
 namespace VkRenderer {
 
-    template<typename T> struct Point{
-        T x,y,z;
-    };
-
     // 列向量
     struct Vector {
         float x, y, z, w;
@@ -62,13 +58,15 @@ namespace VkRenderer {
         }
         Vector normalize() const {
             Vector _v(*this);
+            float len = length();
+            if(len == 0.0f) return _v;
             return _v/length();
         }
 
     };
 
     struct Matrix {
-        float value[4][4];
+        float value[4][4]{};
         Matrix(){
             for(int i=0; i<16; i++) *(value[0]+i) = 0.0f;
         }
@@ -128,6 +126,6 @@ namespace VkRenderer {
     Matrix getView(const Vector& eyePos, const Vector& direction, const Vector& up);
     Matrix lookAt(const Vector& eyePos, const Vector& lookPos);
     Matrix lookAt(const Vector& eyePos, const Vector& lookPos, const Vector& up);
-    Matrix getPerspective(float fov, float near, float far);
+    Matrix getPerspective(float fov, float aspect, float near, float far);
 }
 #endif //VKSOFTWARERENDER_MATHUTILITY_H

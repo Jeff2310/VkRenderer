@@ -80,17 +80,17 @@ namespace VkRenderer {
 
     Matrix translate(float x, float y, float z){
         Matrix _m = identityMatrix();
-        _m.value[3][0] = x;
-        _m.value[3][1] = y;
-        _m.value[3][2] = z;
+        _m.value[0][3] = x;
+        _m.value[1][3] = y;
+        _m.value[2][3] = z;
         return _m;
     }
 
     Matrix translate(const Vector& pos){
         Matrix _m = identityMatrix();
-        _m.value[3][0] = pos.x;
-        _m.value[3][1] = pos.y;
-        _m.value[3][2] = pos.z;
+        _m.value[0][3] = pos.x;
+        _m.value[1][3] = pos.y;
+        _m.value[2][3] = pos.z;
         return _m;
     }
 
@@ -106,7 +106,7 @@ namespace VkRenderer {
     Matrix rotate(float angle, const Vector& v){
         float x=v.x, y=v.y, z=v.z;
         float x2=x*x, y2=y*y, z2=z*z;
-        float cos=cosf(angle), sin=sinf(angle);
+        float cos = cosf(angle / 180 * 3.1415926f), sin = sinf(angle / 180 * 3.1415926f);
         Matrix _m;
         _m.value[0][0] = x2+(1-x2)*cos;
         _m.value[0][1] = x*y*(1-cos)+z*sin;
@@ -118,6 +118,7 @@ namespace VkRenderer {
         _m.value[2][1] = y*z*(1-cos)-x*sin;
         _m.value[2][2] = z2+(1-z2)*cos;
         _m.value[3][3] = 1.0f;
+        return _m;
     }
 
     Matrix getView(const Vector& eyePos, const Vector& direction){
@@ -127,21 +128,22 @@ namespace VkRenderer {
 
     Matrix getView(const Vector& eyePos, const Vector& direction, const Vector& up){
         Matrix _m;
-        Vector _front = direction.normalize() * -1.0f;
-        Vector _up = up.normalize();
-        Vector _right = _up.cross(_front);
+        Vector _back = direction.normalize() * -1.0f;
+        Vector _right = up.normalize().cross(_back);
+        Vector _up = _back.cross(_right);
         _m.value[0][0] = _right.x;
-        _m.value[1][0] = _right.y;
-        _m.value[2][0] = _right.z;
-        _m.value[3][0] = eyePos.dot(_right) * -1.0f;
-        _m.value[0][1] = _up.x;
+        _m.value[0][1] = _right.y;
+        _m.value[0][2] = _right.z;
+        _m.value[0][3] = eyePos.dot(_right) * -1.0f;
+        _m.value[1][0] = _up.x;
         _m.value[1][1] = _up.y;
-        _m.value[2][1] = _up.z;
-        _m.value[3][1] = eyePos.dot(_up) * -1.0f;
-        _m.value[0][2] = _front.x;
-        _m.value[1][2] = _front.y;
-        _m.value[2][2] = _front.z;
-        _m.value[3][2] = eyePos.dot(_front) * -1.0f;
+        _m.value[1][2] = _up.z;
+        _m.value[1][3] = eyePos.dot(_up) * -1.0f;
+        // TODO:find another way to handle reversed z
+        _m.value[2][0] = -_back.x;
+        _m.value[2][1] = -_back.y;
+        _m.value[2][2] = -_back.z;
+        _m.value[2][3] = -eyePos.dot(_back) * -1.0f;
         _m.value[3][3] = 1.0f;
         return _m;
     }
@@ -154,7 +156,16 @@ namespace VkRenderer {
         return getView(eyePos, lookPos-eyePos, up);
     }
 
-    Matrix getPerspective(float fov, float near, float far){
-
+    Matrix getPerspective(float fov, float aspect, float near, float far){
+        // 2*n/h
+        float _2ndh = 1/tanf(fov * 0.5f);
+        Matrix _m;
+        _m.value[0][0] = _2ndh/aspect;
+        _m.value[1][1] = _2ndh;
+        _m.value[2][2] = far/(far-near);
+        _m.value[2][3] = -near*far/(far-near);
+        _m.value[3][2] = 1;
+        return _m;
     }
+
 }
