@@ -40,6 +40,8 @@ namespace VkRenderer {
 
     Vector homogenize(VirtualDevice &device, const Vector &v);
 
+    Vector toViewport(VirtualDevice &device, const Vector &v);
+
     void RenderTriangle(VirtualDevice &device, const Triangle &t);
 }
 

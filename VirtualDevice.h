@@ -8,13 +8,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <string>
-#include <iostream>
 #include "MathUtility.h"
+#include "Primitives.h"
+#include "Camera.h"
 
 using namespace std;
 
 namespace VkRenderer {
-    typedef uint VkColor;
     typedef float VkFloat;
     typedef uint VkUint;
 
@@ -23,12 +23,14 @@ namespace VkRenderer {
         string name;
         //pixels中行从y较大的方向开始存
         char *framebuffer;
-        VkFloat *zbuffer;
+        VkFloat *depthBuffer;
+        VkFloat *stencilBuffer;
         VkUint width, height;
         GLFWwindow *window;
-        VkColor backgroundColor{};
+        Color backgroundColor;
 
     public:
+        Camera *camera;
 
         explicit VirtualDevice(const string &name, VkUint width = 1, VkUint height = 1);
         // todo deep-copy
@@ -41,15 +43,13 @@ namespace VkRenderer {
 
         VkFloat *getDepth(int x, int y);
 
-        VkColor getColor(float r, float g, float b, float a);
-
         bool shouldShutdown();
 
         void setBackgroundColor(float r, float g, float b);
 
         void refreshBuffer();
 
-        void drawPixel(int x, int y, VkColor color);
+        void drawPixel(int x, int y, Color color);
 
         void mainLoop();
     };

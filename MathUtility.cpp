@@ -68,6 +68,11 @@ namespace VkRenderer {
         return _v;
     }
 
+    Vector reflect(const Vector &v, const Vector &normal) {
+        Vector _reflect = normal * normal.dot(v) * 2.0f - v;
+        return _reflect;
+    }
+
     Matrix identityMatrix(){
         Matrix _m;
         for(int i=0; i<4; i++){

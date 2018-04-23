@@ -9,6 +9,7 @@
 #include "VirtualDevice.h"
 #include "GeometryStage.h"
 #include "Primitives.h"
+#include "PhongShading.h"
 
 namespace VkRenderer {
 
@@ -30,9 +31,9 @@ namespace VkRenderer {
 
     void RasterizeTriangle(VirtualDevice &device, const Triangle &t);
 
-    void RasterizePixel(VirtualDevice &device, int x, int y, float z, VkColor color);
+    void RasterizePixel(VirtualDevice &device, int x, int y, float z, Color color);
 
-    void RasterizeLine(VirtualDevice &device, int x1, int y1, int x2, int y2, float z, VkColor color);
+    void RasterizeLine(VirtualDevice &device, int x1, int y1, int x2, int y2, float z, Color color);
 }
 
 #endif //VKSOFTWARERENDER_RASTERISATION_H

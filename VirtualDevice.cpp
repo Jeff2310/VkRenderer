@@ -11,16 +11,17 @@ namespace VkRenderer {
         this->width = width;
         this->height = height;
         framebuffer = new char[height * width * 4];
-        zbuffer = new VkFloat[height * width];
+        depthBuffer = new VkFloat[height * width];
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++)
-                zbuffer[j * height + i] = -100.0f;
-        backgroundColor = 0xFFFFFFFF;
+                depthBuffer[j * height + i] = -100.0f;
+        backgroundColor = Color(1.0f, 1.0f, 1.0f);
         glfwInit(); // TODO: check init status
         glewInit();
         window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
         glfwMakeContextCurrent(window);
+        camera = new Camera(0.0f, 0.0f, 1.0f);
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glViewport(0, 0, (GLsizei) width, (GLsizei) height);
@@ -29,8 +30,8 @@ namespace VkRenderer {
 
     VirtualDevice::~VirtualDevice() {
         delete[] framebuffer;
-        delete[] zbuffer;
-
+        delete[] depthBuffer;
+        delete camera;
     }
 
     int VirtualDevice::getWidth() const { return width; }
@@ -38,28 +39,16 @@ namespace VkRenderer {
     int VirtualDevice::getHeight() const { return height; }
 
     VkFloat *VirtualDevice::getDepth(int x, int y) {
-        return &zbuffer[y * width + x];
+        return &depthBuffer[y * width + x];
     }
 
     bool VirtualDevice::shouldShutdown() {
         return (bool) glfwWindowShouldClose(window);
     }
 
-    //TODO: change color definition to a independent from device;
-    VkColor VirtualDevice::getColor(float r, float g, float b, float a) {
-        VkColor color = 0;
-
-        color = color | ((GLubyte) (r * 255) << 24);
-        color = color | ((GLubyte) (g * 255) << 16);
-        color = color | ((GLubyte) (b * 255) << 8);
-        color = color | (GLubyte) (a * 255);
-
-        return color;
-    }
-
     void VirtualDevice::setBackgroundColor(float r, float g, float b) {
         //glClearColor(r,g,b, 1.0f);
-        backgroundColor = getColor(r, g, b, 1.0f);
+        backgroundColor = Color(r, g, b);
     }
 
     void VirtualDevice::refreshBuffer() {
@@ -67,28 +56,22 @@ namespace VkRenderer {
         glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_BYTE, framebuffer);
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++) {
-                zbuffer[j * width + i] = 1.1f;
+                depthBuffer[j * width + i] = 1.1f;
                 drawPixel(i, j, backgroundColor);
             }
         glfwSwapBuffers(window);
     }
 
-    void VirtualDevice::drawPixel(int x, int y, VkColor color) {
-        char r, g, b, a;
-        r = (char) ((color & 0xFF000000) >> 24),
-        g = (char) ((color & 0x00FF0000) >> 16),
-        b = (char) ((color & 0x0000FF00) >> 8),
-        a = (char) ((color & 0x000000FF));
-        framebuffer[(y * width + x) * 4] = r;
-        framebuffer[(y * width + x) * 4 + 1] = g;
-        framebuffer[(y * width + x) * 4 + 2] = b;
-        framebuffer[(y * width + x) * 4 + 3] = a;
+    void VirtualDevice::drawPixel(int x, int y, Color color) {
+        framebuffer[(y * width + x) * 4] = (char) lround(color.r * 255);
+        framebuffer[(y * width + x) * 4 + 1] = (char) lround(color.g * 255);
+        framebuffer[(y * width + x) * 4 + 2] = (char) lround(color.b * 255);
+        framebuffer[(y * width + x) * 4 + 3] = (char) lround(color.w * 255);
     }
 
     void VirtualDevice::mainLoop() {
         glfwPollEvents();
         // TODO:将Camera改为类的变量
-        static Camera camera(0.0f, 0.0f, 0.0f);
         float x = 0.0f, y = 0.0f, z = 0.0f;
         float yaw = 0.0f, pitch = 0.0f;
         if (glfwGetKey(window, GLFW_KEY_A))
@@ -112,8 +95,8 @@ namespace VkRenderer {
             pitch += 2.0f;
         if (glfwGetKey(window, GLFW_KEY_I))
             pitch -= 2.0f;
-        camera.updatePos(x, y, z);
-        camera.updateView(pitch, yaw);
-        Transform::currentTransform.setView(camera.viewMatrix());
+        camera->updatePos(x, y, z);
+        camera->updateView(pitch, yaw);
+        Transform::currentTransform.setView(camera->viewMatrix());
     }
 }

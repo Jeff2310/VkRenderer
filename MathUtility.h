@@ -117,6 +117,8 @@ namespace VkRenderer {
 
     float interp(float x1, float x2, float t);
     Vector interp(const Vector &v1, const Vector& v2, float t);
+
+    Vector reflect(const Vector &v, const Vector &normal);
     Matrix identityMatrix();
     Matrix translate(float x, float y, float z);
     Matrix translate(const Vector& pos);
