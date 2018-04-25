@@ -33,7 +33,7 @@ namespace VkRenderer {
         }
 
         Vector operator-(const Vector &v) const {
-            Vector _v(x + v.x, y + v.y, z + v.z);
+            Vector _v(x - v.x, y - v.y, z - v.z); //damn it
             return _v;
         }
 

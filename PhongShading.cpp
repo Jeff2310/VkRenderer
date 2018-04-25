@@ -2,13 +2,14 @@
 // Created by jeff2310 on 4/23/18.
 //
 
+#include <iostream>
 #include "MathUtility.h"
 #include "PhongShading.h"
 #include "ShaderVariables.h"
 
 namespace VkRenderer {
 
-    PhongConstants normalPhongVariable = PhongConstants(0.1f, 0.6f, 0.3f, 128, Vector(0.5f, 0.5, 0.5),
+    PhongConstants normalPhongVariable = PhongConstants(0.1f, 0.6f, 0.3f, 32, Vector(0.5f, 0.5f, 1.5f),
                                                         Color(1.0f, 1.0f, 1.0f));
 
     void PhongVertex(Vertex *v) {
@@ -36,17 +37,20 @@ namespace VkRenderer {
 
         Vector lightDir = (variables.lightPos - frag.shaderVariables.fragPos).normalize();
         Vector viewDir = (eyePos - frag.shaderVariables.fragPos).normalize();
-        Vector reflectDir = reflect(lightDir, norm).normalize();
+        Vector reflectDir = reflect(lightDir, norm);
+
+//        cout<<(lightDir-reflectDir).x<<" "<<(lightDir-reflectDir).y<<" "<<(lightDir-reflectDir).z<<endl;
+//        cout<<(lightDir-reflectDir).dot(norm)<<endl;
 
         float ambient = variables.ambient;
 
         float diffuse = variables.diffuse * max(norm.dot(lightDir), 0.0f);
 
         float specular = variables.specular * powf(max(viewDir.dot(reflectDir), 0.0f), variables.shiniess);
-        //float specular = 0.0f;
-        // cout<<viewDir.dot(reflectDir)<<endl;
 
-        fragColor = baseColor * (0.0f + specular);
+        //cout<<frag.shaderVariables.fragPos.x<<" "<<frag.shaderVariables.fragPos.y<<" "<<frag.shaderVariables.fragPos.z<<endl;
+
+        fragColor = baseColor * (ambient + diffuse + specular);
         return fragColor;
     }
 }

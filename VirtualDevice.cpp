@@ -21,7 +21,7 @@ namespace VkRenderer {
         window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
         glfwMakeContextCurrent(window);
-        camera = new Camera(0.0f, 0.0f, 1.0f);
+        camera = new Camera(0.0f, 0.0f, 3.0f);
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glViewport(0, 0, (GLsizei) width, (GLsizei) height);

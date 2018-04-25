@@ -1,3 +1,4 @@
+#include <iostream>
 #include "GeometryStage.h"
 #include "Rasterisation.h"
 #include "Camera.h"
@@ -65,7 +66,7 @@ int main() {
 
         device.refreshBuffer();
         device.mainLoop();
-        Transform::currentTransform.setModel(translate(0.0f, 0.0f, -2.0f));
+        Transform::currentTransform.setModel(identityMatrix());
         RenderTriangle(device, front1);
         RenderTriangle(device, front2);
         RenderTriangle(device, right1);
