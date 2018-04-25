@@ -71,7 +71,6 @@ namespace VkRenderer {
 
     void VirtualDevice::mainLoop() {
         glfwPollEvents();
-        // TODO:将Camera改为类的变量
         float x = 0.0f, y = 0.0f, z = 0.0f;
         float yaw = 0.0f, pitch = 0.0f;
         if (glfwGetKey(window, GLFW_KEY_A))

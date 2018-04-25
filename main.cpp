@@ -65,7 +65,7 @@ int main() {
 
         device.refreshBuffer();
         device.mainLoop();
-        Transform::currentTransform.setModel(translate(0.0f, 0.0f, -2.0f) * scale(0.5f, 0.5f, 0.5f));
+        Transform::currentTransform.setModel(translate(0.0f, 0.0f, -2.0f));
         RenderTriangle(device, front1);
         RenderTriangle(device, front2);
         RenderTriangle(device, right1);

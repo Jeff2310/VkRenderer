@@ -5,56 +5,19 @@
 #ifndef VKSOFTWARERENDER_PRIMITIVES_H
 #define VKSOFTWARERENDER_PRIMITIVES_H
 
+#include "MathUtility.h"
+#include "ShaderVariables.h"
+
 namespace VkRenderer {
-
-    struct Color{
-        float r,g,b,w;
-
-        Color() : r(0.0f), g(0.0f), b(0.0f), w(1.0f) {}
-
-        Color(float _r, float _g, float _b, float _w = 1.0f) : r(_r), g(_g), b(_b), w(_w) {
-            if (r < 0.0f) r = 0.0f;
-            if (r > 1.0f) r = 1.0f;
-            if (g < 0.0f) g = 0.0f;
-            if (g > 1.0f) g = 1.0f;
-            if (b < 0.0f) b = 0.0f;
-            if (b > 1.0f) b = 1.0f;
-            if (w < 0.0f) w = 0.0f;
-            if (w > 1.0f) w = 1.0f;
-        }
-
-        Color operator+(const Color &c) const {
-            Color _c(r + c.r, g + c.g, b + c.b, w);
-            return _c;
-        }
-
-        Color operator-(const Color &c) const {
-            Color _c(r - c.r, g - c.g, b - c.b, w);
-            return _c;
-        }
-
-        Color operator*(const Color &c) const {
-            Color _c(r * c.r, g * c.g, b * c.b, w);
-            return _c;
-        }
-
-        Color operator*(float t) const {
-            Color _c(r * t, g * t, b * t, w);
-            return _c;
-        }
-    };
-
-    struct TextureCoordinate{
-        float u,v;
-    };
-
     // primitives
 
-    struct Vertex {
+    class Vertex {
+    public:
         Vector pos;
         TextureCoordinate texCoord;
         Color color;
         Vector normal;
+        PhongVariables shaderVariables;
     };
 
     struct Line {
@@ -72,6 +35,8 @@ namespace VkRenderer {
         float top, bottom;
         Line left, right;
     };
+
+    Vertex interp(const Vertex &v1, const Vertex &v2, float t);
 
 }
 #endif //VKSOFTWARERENDER_PRIMITIVES_H

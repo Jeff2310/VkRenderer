@@ -9,7 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include "MathUtility.h"
-#include "Primitives.h"
 #include "Camera.h"
 
 using namespace std;

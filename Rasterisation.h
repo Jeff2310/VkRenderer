@@ -5,11 +5,8 @@
 #ifndef VKSOFTWARERENDER_RASTERISATION_H
 #define VKSOFTWARERENDER_RASTERISATION_H
 
-#include "MathUtility.h"
 #include "VirtualDevice.h"
-#include "GeometryStage.h"
 #include "Primitives.h"
-#include "PhongShading.h"
 
 namespace VkRenderer {
 
@@ -25,7 +22,7 @@ namespace VkRenderer {
     // 分割三角形以供光栅化
     int DivideTriangle(SubTriangle *result, Triangle t);
 
-    Scanline generateScanline(const SubTriangle &t, int y, int min, int max);
+    Scanline generateScanline(const SubTriangle &t, int y);
 
     void RasterizeScanline(VirtualDevice &device, const Scanline &scanline);
 

@@ -173,4 +173,56 @@ namespace VkRenderer {
         return _m;
     }
 
+
+    Transform Transform::currentTransform = Transform();
+
+    Transform::Transform() {
+        _model = _view = _projection = _summary = identityMatrix();
+    }
+
+    Transform::Transform(const Matrix &model, const Matrix &view, const Matrix &projection) {
+        _model = model;
+        _view = view;
+        _projection = projection;
+        _summary = _projection * _view * _model;
+    }
+
+    void Transform::setModel(const Matrix &model) {
+        _model = model;
+        _summary = _projection * _view * _model;
+    }
+
+    void Transform::setView(const Matrix &view) {
+        _view = view;
+        _summary = _projection * _view * _model;
+    }
+
+    void Transform::setProjection(const Matrix &projection) {
+        _projection = projection;
+        _summary = _projection * _view * _model;
+    }
+
+    Matrix Transform::getModel() {
+        return _model;
+    }
+
+    void Transform::toWorld(Vector *v) {
+        *v = _model * (*v);
+    }
+
+    void Transform::toScreen(Vector *v) {
+        *v = _summary * (*v);
+    }
+
+    Vector Transform::toWorld(const Vector &v) {
+        return _model * v;
+    }
+
+    Vector Transform::toScreen(const Vector &v) {
+        return _summary * v;
+    }
+
+    void bindTransform(const Transform &t) {
+        Transform::currentTransform = t;
+    }
 }

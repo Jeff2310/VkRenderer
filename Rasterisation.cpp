@@ -2,33 +2,13 @@
 // Created by jeff2310 on 4/16/18.
 //
 
+#include <iostream>
 #include "MathUtility.h"
 #include "Rasterisation.h"
 #include "PhongShading.h"
 
 
 namespace VkRenderer {
-    /* const float ambient;
-     * const float diffuse;
-     * const float specular;
-     * int float shiniess;
-
-     * const Vector lightPos;
-     * const Color lightColor;
-     */
-
-    Vertex interp(const Vertex &v1, const Vertex &v2, float t) {
-        Vertex _v;
-        _v.pos = interp(v1.pos, v2.pos, t);
-        _v.texCoord.u = interp(v1.texCoord.u, v2.texCoord.u, t);
-        _v.texCoord.v = interp(v1.texCoord.v, v2.texCoord.v, t);
-        _v.color.r = interp(v1.color.r, v2.color.r, t);
-        _v.color.g = interp(v1.color.g, v2.color.g, t);
-        _v.color.b = interp(v1.color.b, v2.color.b, t);
-        _v.color.w = interp(v1.color.w, v2.color.w, t);
-        _v.normal = interp(v1.normal, v2.normal, t);
-        return _v;
-    }
 
     int DivideTriangle(SubTriangle *result, Triangle t) {
         Vertex *p1 = &t.p1, *p2 = &t.p2, *p3 = &t.p3;
@@ -88,12 +68,15 @@ namespace VkRenderer {
     Scanline generateScanline(const SubTriangle &t, int y) {
         Scanline _scanline;
         float top, bottom, k;
+        Vector middle;
+        float m;
 
         _scanline.y = y;
 
         top = lround(t.left.p2.pos.y);
         bottom = lround(t.left.p1.pos.y);
         k = ((float) y - bottom) / (top - bottom);
+
         _scanline.lvertex = interp(t.left.p1, t.left.p2, k);
         _scanline.left = (int) lround(_scanline.lvertex.pos.x);
 
@@ -116,8 +99,9 @@ namespace VkRenderer {
                 k = (float) (x - left) / (right - left);
                 // 扫描线两端定点插值得到fragment
                 fragment = interp(scanline.lvertex, scanline.rvertex, k);
-                Color phongColor = PhongFragment(device, fragment.pos, device.camera->pos(), fragment.normal,
-                                                 fragment.color, normalPhongVariable);
+                Vector eyePos = Transform::currentTransform.toWorld(device.camera->pos());
+                //cout<<fragment.shaderVariables.fragPos.x<<" "<<fragment.shaderVariables.fragPos.y<<" "<<fragment.shaderVariables.fragPos.z<<endl;
+                Color phongColor = PhongFragment(fragment, eyePos, normalPhongVariable);
                 RasterizePixel(device, x, scanline.y, fragment.pos.z, phongColor);
             }
         }
