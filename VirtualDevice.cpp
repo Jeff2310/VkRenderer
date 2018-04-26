@@ -66,7 +66,7 @@ namespace VkRenderer {
         framebuffer[(y * width + x) * 4] = (char) lround(color.r * 255);
         framebuffer[(y * width + x) * 4 + 1] = (char) lround(color.g * 255);
         framebuffer[(y * width + x) * 4 + 2] = (char) lround(color.b * 255);
-        framebuffer[(y * width + x) * 4 + 3] = (char) lround(color.w * 255);
+        framebuffer[(y * width + x) * 4 + 3] = (char) lround(color.a * 255);
     }
 
     void VirtualDevice::mainLoop() {

@@ -16,9 +16,6 @@ namespace VkRenderer {
         int y, left, right;
     };
 
-    // 插值得到顶点间fragment的信息
-    Vertex interp(const Vertex &v1, const Vertex &v2, float t);
-
     // 分割三角形以供光栅化
     int DivideTriangle(SubTriangle *result, Triangle t);
 

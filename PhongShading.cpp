@@ -39,16 +39,11 @@ namespace VkRenderer {
         Vector viewDir = (eyePos - frag.shaderVariables.fragPos).normalize();
         Vector reflectDir = reflect(lightDir, norm);
 
-//        cout<<(lightDir-reflectDir).x<<" "<<(lightDir-reflectDir).y<<" "<<(lightDir-reflectDir).z<<endl;
-//        cout<<(lightDir-reflectDir).dot(norm)<<endl;
-
         float ambient = variables.ambient;
 
         float diffuse = variables.diffuse * max(norm.dot(lightDir), 0.0f);
 
         float specular = variables.specular * powf(max(viewDir.dot(reflectDir), 0.0f), variables.shiniess);
-
-        //cout<<frag.shaderVariables.fragPos.x<<" "<<frag.shaderVariables.fragPos.y<<" "<<frag.shaderVariables.fragPos.z<<endl;
 
         fragColor = baseColor * (ambient + diffuse + specular);
         return fragColor;

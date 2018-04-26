@@ -68,6 +68,11 @@ namespace VkRenderer {
         return _v;
     }
 
+    Color interp(const Color &c1, const Color &c2, float t) {
+        Color _c(interp(c1.r, c2.r, t), interp(c1.g, c2.g, t), interp(c1.b, c2.b, t), interp(c1.a, c2.a, t));
+        return _c;
+    }
+
     Vector reflect(const Vector &v, const Vector &normal) {
         Vector _reflect = normal * normal.dot(v) * 2.0f - v;
         return _reflect;

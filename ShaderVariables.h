@@ -31,9 +31,10 @@ namespace VkRenderer {
     public:
         Vector fragPos;
 
-        static PhongVariables variablesInterp(const PhongVariables &v1, const PhongVariables &v2, float t) {
+        static PhongVariables
+        variablesInterp(const PhongVariables &v1, const PhongVariables &v2, float t, float perspective_inv) {
             PhongVariables v;
-            v.fragPos = interp(v1.fragPos, v2.fragPos, t);
+            v.fragPos = interp(v1.fragPos, v2.fragPos, t) * perspective_inv;
             return v;
         }
     };
