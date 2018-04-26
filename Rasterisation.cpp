@@ -101,7 +101,7 @@ namespace VkRenderer {
                 fragment = interp(scanline.lvertex, scanline.rvertex, k);
                 Vector eyePos = Transform::currentTransform.toWorld(device.camera->pos());
                 //cout<<fragment.shaderVariables.fragPos.x<<" "<<fragment.shaderVariables.fragPos.y<<" "<<fragment.shaderVariables.fragPos.z<<endl;
-                Color phongColor = PhongFragment(fragment, eyePos, normalPhongVariable);
+                Color phongColor = PhongFragment(fragment, eyePos, normalPhongConstants);
                 RasterizePixel(device, x, scanline.y, fragment.pos.z, phongColor);
             }
         }

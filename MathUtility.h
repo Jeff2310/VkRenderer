@@ -195,6 +195,10 @@ namespace VkRenderer {
 
     struct TextureCoordinate {
         float u, v;
+
+        TextureCoordinate() : u(0.0f), v(0.0f) {}
+
+        TextureCoordinate(float _u, float _v) : u(_u), v(_v) {}
     };
 
     void bindTransform(const Transform &t);

@@ -7,6 +7,9 @@
 
 #include "MathUtility.h"
 #include "ShaderVariables.h"
+#include "VirtualDevice.h"
+
+#include <vector>
 
 namespace VkRenderer {
     // primitives
@@ -18,12 +21,22 @@ namespace VkRenderer {
         Color color;
         Vector normal;
         PhongVariables shaderVariables;
+
+        Vertex() : texCoord(), shaderVariables() {}
+
+        Vertex(const Vector &_pos, const TextureCoordinate &_texCoord, const Color &_color,
+               const Vector &_normal, const PhongVariables &_shaderVariables) :
+                pos(_pos), texCoord(_texCoord),
+                color(_color), normal(_normal),
+                shaderVariables(_shaderVariables) {}
     };
 
     struct Line {
         // 注意, Line的p1在下 p2在上
         Vertex p1, p2;
-        Line():p1(),p2(){}
+
+        Line() : p1(), p2() {}
+
         Line(const Vertex &_p1, const Vertex &_p2) : p1(_p1), p2(_p2) {}
     };
 
@@ -35,6 +48,28 @@ namespace VkRenderer {
         float top, bottom;
         Line left, right;
     };
+
+    class Mesh {
+    private:
+        std::vector<Vertex> vertices;
+        std::vector<Triangle> faces;
+        int vertexCount;
+    public:
+        Mesh();
+
+        Mesh(const Mesh &m);
+
+        int count();
+
+        void addVertex(const Vertex &v);
+
+        void build();
+
+        void render(VirtualDevice &device);
+
+    };
+
+    Mesh createCube(float length, const Color *colors);
 
     Vertex interp(const Vertex &v1, const Vertex &v2, float t);
 

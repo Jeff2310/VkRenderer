@@ -52,13 +52,23 @@ namespace VkRenderer {
 
 
         Triangle _t{_p1, _p2, _p3};
-        RasterizeTriangle(device, _t);
-//        RasterizeLine(device, (int) _p1.pos.x, (int) _p1.pos.y, (int) _p2.pos.x, (int) _p2.pos.y, 0.01f,
-//                      Color(0.0f, 0.0f, 0.0f, 1.0f));
-//        RasterizeLine(device, (int) _p2.pos.x, (int) _p2.pos.y, (int) _p3.pos.x, (int) _p3.pos.y, 0.01f,
-//                      Color(0.0f, 0.0f, 0.0f, 1.0f));
-//        RasterizeLine(device, (int) _p1.pos.x, (int) _p1.pos.y, (int) _p3.pos.x, (int) _p3.pos.y, 0.01f,
-//                      Color(0.0f, 0.0f, 0.0f, 1.0f));
 
+        if (device.drawMode & DRAW_FACES) {
+            RasterizeTriangle(device, _t);
+        }
+        if (device.drawMode & DRAW_BORDERS) {
+            RasterizeLine(device, (int) _p1.pos.x, (int) _p1.pos.y, (int) _p2.pos.x, (int) _p2.pos.y, 0.01f,
+                          Color(0.0f, 0.0f, 0.0f, 1.0f));
+            RasterizeLine(device, (int) _p2.pos.x, (int) _p2.pos.y, (int) _p3.pos.x, (int) _p3.pos.y, 0.01f,
+                          Color(0.0f, 0.0f, 0.0f, 1.0f));
+            RasterizeLine(device, (int) _p1.pos.x, (int) _p1.pos.y, (int) _p3.pos.x, (int) _p3.pos.y, 0.01f,
+                          Color(0.0f, 0.0f, 0.0f, 1.0f));
+        }
+    }
+
+    void Mesh::render(VirtualDevice &device) {
+        for (int i = 0; i < faces.size(); i++) {
+            RenderTriangle(device, faces[i]);
+        }
     }
 }

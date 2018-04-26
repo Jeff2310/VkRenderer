@@ -14,8 +14,13 @@
 using namespace std;
 
 namespace VkRenderer {
+#define DRAW_FACES 1
+#define DRAW_BORDERS 2
+#define DRAW_DEPTH 3
+
     typedef float VkFloat;
     typedef uint VkUint;
+    typedef unsigned char VkModeCode;
 
     class VirtualDevice {
     private:
@@ -28,8 +33,10 @@ namespace VkRenderer {
         GLFWwindow *window;
         Color backgroundColor;
 
+
     public:
         Camera *camera;
+        VkModeCode drawMode;
 
         explicit VirtualDevice(const string &name, VkUint width = 1, VkUint height = 1);
         // todo deep-copy
@@ -47,6 +54,8 @@ namespace VkRenderer {
         void setBackgroundColor(float r, float g, float b);
 
         void refreshBuffer();
+
+        void setMode(VkModeCode modeCode, bool enabled);
 
         void drawPixel(int x, int y, Color color);
 

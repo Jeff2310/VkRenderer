@@ -15,27 +15,25 @@ set(GLEW_INCLUDE_DIR ${SUMMARY_DEBUG_SOURCE_DIR}/opengl_helper/include/GLEW)
 set(GLEW_LIBRARY /lib/libGLEW.so)
 
 #将上述的头文件目录添加到一个列表变量之中
-list( APPEND SUMMARY_DEBUG_INCLUDE ${GLFW3_INCLUDE_DIR} )
-list( APPEND SUMMARY_DEBUG_INCLUDE ${GLEW_INCLUDE_DIR} )
+list(APPEND SUMMARY_DEBUG_INCLUDE ${GLFW3_INCLUDE_DIR})
+list(APPEND SUMMARY_DEBUG_INCLUDE ${GLEW_INCLUDE_DIR})
 
 #将上述的库文件目录添加到一个列表变量之中
-list( APPEND SUMMARY_DEBUG_LIBS ${GLFW3_LIBRARY} )
-list( APPEND SUMMARY_DEBUG_LIBS ${GLEW_LIBRARY} )
+list(APPEND SUMMARY_DEBUG_LIBS ${GLFW3_LIBRARY})
+list(APPEND SUMMARY_DEBUG_LIBS ${GLEW_LIBRARY})
 
 #利用find_package命令找到OpenGL
-find_package( OpenGL REQUIRED )
-list( APPEND SUMMARY_DEBUG_LIBS ${OPENGL_gl_LIBRARY} )
+find_package(OpenGL REQUIRED)
+list(APPEND SUMMARY_DEBUG_LIBS ${OPENGL_gl_LIBRARY})
 
 #设置项目的头文件包含目录
-include_directories( ${SUMMARY_DEBUG_INCLUDE} )
+include_directories(${SUMMARY_DEBUG_INCLUDE})
 
 #在当前目录下搜索头文件及源文件
-file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
-file(GLOB CURRENT_SOURCES  *.cpp)
+file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
+file(GLOB CURRENT_SOURCES *.cpp)
 #为头文件和源文件进行分组
-#source_group("Include" FILES ${CURRENT_HEADERS})
-#source_group("Source" FILES ${CURRENT_SOURCES})
 
 add_executable(VkSoftwareRender ${CURRENT_HEADERS} ${CURRENT_SOURCES})
 #设置项目的外部依赖库
-target_link_libraries(VkSoftwareRender  -lglfw -lGLEW -lGLU -lGL)
+target_link_libraries(VkSoftwareRender -lglfw -lGLEW -lGLU -lGL)

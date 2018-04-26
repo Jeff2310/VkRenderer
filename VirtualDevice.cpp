@@ -25,6 +25,8 @@ namespace VkRenderer {
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glViewport(0, 0, (GLsizei) width, (GLsizei) height);
+
+        drawMode = DRAW_FACES;
     }
     // todo deep-copy
 
@@ -60,6 +62,13 @@ namespace VkRenderer {
                 drawPixel(i, j, backgroundColor);
             }
         glfwSwapBuffers(window);
+    }
+
+    void VirtualDevice::setMode(VkModeCode modeCode, bool enabled) {
+        if (enabled)
+            drawMode |= modeCode;
+        else
+            drawMode &= ~modeCode;
     }
 
     void VirtualDevice::drawPixel(int x, int y, Color color) {

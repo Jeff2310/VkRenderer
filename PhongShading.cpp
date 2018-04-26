@@ -9,8 +9,8 @@
 
 namespace VkRenderer {
 
-    PhongConstants normalPhongVariable = PhongConstants(0.1f, 0.6f, 0.3f, 32, Vector(0.5f, 0.5f, 1.5f),
-                                                        Color(1.0f, 1.0f, 1.0f));
+    PhongConstants normalPhongConstants = PhongConstants(0.1f, 0.6f, 0.3f, 32, Vector(1.0f, 1.0f, 1.0f),
+                                                         Color(1.0f, 1.0f, 1.0f));
 
     void PhongVertex(Vertex *v) {
 

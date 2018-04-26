@@ -31,6 +31,10 @@ namespace VkRenderer {
     public:
         Vector fragPos;
 
+        PhongVariables() : fragPos(0.0f, 0.0f, 0.0f) {}
+
+        PhongVariables(Vector _pos) : fragPos(_pos) {}
+
         static PhongVariables
         variablesInterp(const PhongVariables &v1, const PhongVariables &v2, float t, float perspective_inv) {
             PhongVariables v;
@@ -39,7 +43,7 @@ namespace VkRenderer {
         }
     };
 
-    extern PhongConstants normalPhongVariable;
+    extern PhongConstants normalPhongConstants;
 }
 
 #endif //VKSOFTWARERENDER_SHADERVARIABLES_H
