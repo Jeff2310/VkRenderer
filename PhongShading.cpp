@@ -9,7 +9,7 @@
 
 namespace VkRenderer {
 
-    PhongConstants normalPhongConstants = PhongConstants(0.1f, 0.6f, 0.3f, 32, Vector(1.0f, 1.0f, 1.0f),
+    PhongConstants normalPhongConstants = PhongConstants(0.2f, 0.6f, 0.5f, 32, Vector(1.0f, 1.0f, 1.0f),
                                                          Color(1.0f, 1.0f, 1.0f));
 
     void PhongVertex(Vertex *v) {
@@ -46,6 +46,8 @@ namespace VkRenderer {
         float specular = variables.specular * powf(max(viewDir.dot(reflectDir), 0.0f), variables.shiniess);
 
         fragColor = baseColor * (ambient + diffuse + specular);
+//        fragColor = Color(frag.normal.x, frag.normal.y, frag.normal.z);
         return fragColor;
+//        return Color(1.0f, 1.0f, 1.0f);
     }
 }

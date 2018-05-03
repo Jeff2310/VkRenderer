@@ -71,6 +71,8 @@ namespace VkRenderer {
 
     Mesh createCube(float length, const Color *colors);
 
+    Mesh createSphere(float radius, float angle_step);
+
     Vertex interp(const Vertex &v1, const Vertex &v2, float t);
 
 }

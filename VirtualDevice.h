@@ -17,6 +17,7 @@ namespace VkRenderer {
 #define DRAW_FACES 1
 #define DRAW_BORDERS 2
 #define DRAW_DEPTH 3
+#define FACE_CULLING 4
 
     typedef float VkFloat;
     typedef uint VkUint;
@@ -26,7 +27,7 @@ namespace VkRenderer {
     private:
         string name;
         //pixels中行从y较大的方向开始存
-        char *framebuffer;
+//        unsigned char *framebuffer;
         VkFloat *depthBuffer;
         VkFloat *stencilBuffer;
         VkUint width, height;
@@ -35,8 +36,10 @@ namespace VkRenderer {
 
 
     public:
+        unsigned char *framebuffer;
         Camera *camera;
         VkModeCode drawMode;
+        VkModeCode optimizationMode;
 
         explicit VirtualDevice(const string &name, VkUint width = 1, VkUint height = 1);
         // todo deep-copy
@@ -55,7 +58,9 @@ namespace VkRenderer {
 
         void refreshBuffer();
 
-        void setMode(VkModeCode modeCode, bool enabled);
+        void setDrawMode(VkModeCode modeCode, bool enabled);
+
+        void setOptimization(VkModeCode modeCode, bool enabled);
 
         void drawPixel(int x, int y, Color color);
 

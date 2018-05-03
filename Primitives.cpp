@@ -128,6 +128,106 @@ namespace VkRenderer {
         return cube;
     }
 
+    Mesh createSphere(float radius, float angle_step) {
+        Mesh sphere;
+        int count = (int) lround(360.0f / angle_step);
+        angle_step = 2.0f * 3.1415926f / count;
+
+        float theta = 0.0f, phi;
+        float theta_next, phi_next;
+        float x11, x12, x21, x22;
+        float z11, z12, z21, z22;
+        float y11, y12, y21, y22;
+        Vector pos11, pos12, pos21, pos22;
+
+        Color color(0.6, 0.24, 0.3);
+
+        // phi and theta are exchanged here
+        while (theta < 2.0f * 3.1415926f) {
+            theta_next = theta + angle_step;
+            if (theta_next >= 2.0f * 3.1415926f) break;
+            phi = -0.5f * 3.1415926f;
+            while (phi < 0.5f * 3.1415926f) {
+                phi_next = phi + angle_step;
+                if (phi_next >= 0.5f * 3.1415926f) break;
+
+                pos11 = Vector(cosf(phi) * cosf(theta), sinf(phi), cosf(phi) * sinf(theta)) * radius;
+                pos12 = Vector(cosf(phi) * cosf(theta_next), sinf(phi), cosf(phi) * sinf(theta_next)) * radius;
+                pos21 = Vector(cosf(phi_next) * cosf(theta), sinf(phi_next), cosf(phi_next) * sinf(theta)) * radius;
+                pos22 = Vector(cosf(phi_next) * cosf(theta_next), sinf(phi_next), cosf(phi_next) * sinf(theta_next)) *
+                        radius;
+
+                sphere.addVertex(
+                        Vertex(
+                                pos11,
+                                TextureCoordinate(0.0f, 0.0f),
+                                color,
+                                pos11,
+                                PhongVariables(pos11)
+                        )
+                );
+
+                sphere.addVertex(
+                        Vertex(
+                                pos12,
+                                TextureCoordinate(0.0f, 0.0f),
+                                color,
+                                pos12,
+                                PhongVariables(pos12)
+                        )
+                );
+
+                sphere.addVertex(
+                        Vertex(
+                                pos22,
+                                TextureCoordinate(0.0f, 0.0f),
+                                color,
+                                pos22,
+                                PhongVariables(pos22)
+                        )
+                );
+
+                sphere.addVertex(
+                        Vertex(
+                                pos11,
+                                TextureCoordinate(0.0f, 0.0f),
+                                color,
+                                pos11,
+                                PhongVariables(pos11)
+                        )
+                );
+
+                sphere.addVertex(
+                        Vertex(
+                                pos22,
+                                TextureCoordinate(0.0f, 0.0f),
+                                color,
+                                pos22,
+                                PhongVariables(pos22)
+                        )
+                );
+
+                sphere.addVertex(
+                        Vertex(
+                                pos21,
+                                TextureCoordinate(0.0f, 0.0f),
+                                color,
+                                pos21,
+                                PhongVariables(pos21)
+                        )
+                );
+
+
+                //phi +=45.0f;
+                phi = phi_next;
+            }
+            theta = theta_next;
+        }
+
+        sphere.build();
+        return sphere;
+    }
+
     Vertex interp(const Vertex &v1, const Vertex &v2, float t) {
         Vertex _v;
         float perspective_inv;

@@ -47,7 +47,11 @@ namespace VkRenderer {
             result[0].top = result[1].bottom = p2->pos.y;
             result[1].top = p3->pos.y;
             //插值获得p2在线段p1p3上的投影点
-            float k = (p2->pos.y - p1->pos.y) / (p3->pos.y - p1->pos.y);
+            float k;
+            if (p3->pos.y == p1->pos.y)
+                k = 0.0f;
+            else
+                k = (p2->pos.y - p1->pos.y) / (p3->pos.y - p1->pos.y);
             Vertex _p0 = interp(*p1, *p3, k);
             // p2在p0左侧
             if (p2->pos.x <= _p0.pos.x) {
@@ -68,21 +72,26 @@ namespace VkRenderer {
     Scanline generateScanline(const SubTriangle &t, int y) {
         Scanline _scanline;
         float top, bottom, k;
-        Vector middle;
-        float m;
+        // top 可能等于bottom， 此时不用插值直接算就行了
 
         _scanline.y = y;
 
         top = lround(t.left.p2.pos.y);
         bottom = lround(t.left.p1.pos.y);
-        k = ((float) y - bottom) / (top - bottom);
+        if (top == bottom)
+            k = 0.0f;
+        else
+            k = ((float) y - bottom) / (top - bottom);
 
         _scanline.lvertex = interp(t.left.p1, t.left.p2, k);
         _scanline.left = (int) lround(_scanline.lvertex.pos.x);
 
         top = lround(t.right.p2.pos.y);
         bottom = lround(t.right.p1.pos.y);
-        k = ((float) y - bottom) / (top - bottom);
+        if (top == bottom)
+            k = 0.0f;
+        else
+            k = ((float) y - bottom) / (top - bottom);
         _scanline.rvertex = interp(t.right.p1, t.right.p2, k);
         _scanline.right = (int) lround(_scanline.rvertex.pos.x);
         return _scanline;
@@ -94,31 +103,35 @@ namespace VkRenderer {
         Vertex fragment;
         float k;
 #pragma omp parallel for
-        for (int x = left; x <= right; x++) {
-            if (x >= 0 && x < screenWidth) {
+        for (int x = left - 1; x <= right + 1; x++) {
+            // 两边扩展一下，缓解三角形连接处接不上的问题
+            if (x < 0 || x > screenWidth) continue;
+            if (left == right)
+                k = 0.0f;
+            else
                 k = (float) (x - left) / (right - left);
-                // 扫描线两端定点插值得到fragment
-                fragment = interp(scanline.lvertex, scanline.rvertex, k);
-                Vector eyePos = Transform::currentTransform.toWorld(device.camera->pos());
-                //cout<<fragment.shaderVariables.fragPos.x<<" "<<fragment.shaderVariables.fragPos.y<<" "<<fragment.shaderVariables.fragPos.z<<endl;
-                Color phongColor = PhongFragment(fragment, eyePos, normalPhongConstants);
-                RasterizePixel(device, x, scanline.y, fragment.pos.z, phongColor);
-            }
+            // 扫描线两端定点插值得到fragment
+            fragment = interp(scanline.lvertex, scanline.rvertex, k);
+            Vector eyePos = Transform::currentTransform.toWorld(device.camera->pos());
+            Color phongColor = PhongFragment(fragment, eyePos, normalPhongConstants);
+            RasterizePixel(device, x, scanline.y, fragment.pos.z, phongColor);
         }
     }
 
-    void RasterizeTriangle(VirtualDevice &screen, const Triangle &t) {
+    void RasterizeTriangle(VirtualDevice &device, const Triangle &t) {
         SubTriangle result[2];
         int count = DivideTriangle(result, t);
         if (count == 0) {
             return;
         } else {
             for (int i = 0; i < count; i++) {
+                // 1为平顶三角形， 2为平底三角形
+
 #pragma omp parallel for
-                for (auto y = (int) lround(result[i].bottom); y < (int) lround(result[i].top); y++) {
-                    if (y < 0 || y > screen.getHeight()) continue;// damn it
+                for (auto y = (int) lround(result[i].bottom); y <= (int) lround(result[i].top); y++) {
+                    if (y < 0 || y > device.getHeight()) continue;// damn it
                     Scanline s = generateScanline(result[i], y);
-                    RasterizeScanline(screen, s);
+                    RasterizeScanline(device, s);
                 }
             }
         }

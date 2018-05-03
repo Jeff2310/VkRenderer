@@ -10,7 +10,7 @@ set(GLFW3_INCLUDE_DIR /include/GLFW)
 set(GLFW3_LIBRARY /lib/libglfw.so)
 
 #设置GLEW库的头文件目录
-set(GLEW_INCLUDE_DIR ${SUMMARY_DEBUG_SOURCE_DIR}/opengl_helper/include/GLEW)
+set(GLEW_INCLUDE_DIR /include/GLEW)
 #设置GLEW库的库文件目录
 set(GLEW_LIBRARY /lib/libGLEW.so)
 
@@ -31,9 +31,9 @@ include_directories(${SUMMARY_DEBUG_INCLUDE})
 
 #在当前目录下搜索头文件及源文件
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
-file(GLOB CURRENT_SOURCES *.cpp)
+file(GLOB CURRENT_SOURCES *.cpp TextureLoader/*.cpp)
 #为头文件和源文件进行分组
 
 add_executable(VkSoftwareRender ${CURRENT_HEADERS} ${CURRENT_SOURCES})
 #设置项目的外部依赖库
-target_link_libraries(VkSoftwareRender -lglfw -lGLEW -lGLU -lGL)
+target_link_libraries(VkSoftwareRender -lglfw -lGLEW -lGLU -lGL -lfreeimage)

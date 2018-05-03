@@ -53,6 +53,24 @@ namespace VkRenderer {
 
         Triangle _t{_p1, _p2, _p3};
 
+        if (device.optimizationMode & FACE_CULLING) {
+            Vector faceNormal[3], facePos[3];
+            faceNormal[0] = _p1.normal;
+            faceNormal[1] = _p2.normal;
+            faceNormal[2] = _p3.normal;
+            facePos[0] = _p1.shaderVariables.fragPos;
+            facePos[1] = _p2.shaderVariables.fragPos;
+            facePos[2] = _p3.shaderVariables.fragPos;
+            bool is_back = true;
+            for (int i = 0; i < 3; i++) {
+                if (faceNormal[i].dot(facePos[i] - device.camera->pos()) < 0) {
+                    is_back = false;
+                    break;
+                }
+            }
+            if (is_back) return;
+        }
+
         if (device.drawMode & DRAW_FACES) {
             RasterizeTriangle(device, _t);
         }

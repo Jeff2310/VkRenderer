@@ -10,7 +10,7 @@ namespace VkRenderer {
     VirtualDevice::VirtualDevice(const string &name, VkUint width, VkUint height) {
         this->width = width;
         this->height = height;
-        framebuffer = new char[height * width * 4];
+        framebuffer = new unsigned char[height * width * 4];
         depthBuffer = new VkFloat[height * width];
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++)
@@ -27,6 +27,7 @@ namespace VkRenderer {
         glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 
         drawMode = DRAW_FACES;
+        optimizationMode = 0;
     }
     // todo deep-copy
 
@@ -64,11 +65,18 @@ namespace VkRenderer {
         glfwSwapBuffers(window);
     }
 
-    void VirtualDevice::setMode(VkModeCode modeCode, bool enabled) {
+    void VirtualDevice::setDrawMode(VkModeCode modeCode, bool enabled) {
         if (enabled)
             drawMode |= modeCode;
         else
             drawMode &= ~modeCode;
+    }
+
+    void VirtualDevice::setOptimization(VkModeCode modeCode, bool enabled) {
+        if (enabled)
+            optimizationMode |= modeCode;
+        else
+            optimizationMode &= ~modeCode;
     }
 
     void VirtualDevice::drawPixel(int x, int y, Color color) {
