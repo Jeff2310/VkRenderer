@@ -135,10 +135,8 @@ namespace VkRenderer {
 
         float theta = 0.0f, phi;
         float theta_next, phi_next;
-        float x11, x12, x21, x22;
-        float z11, z12, z21, z22;
-        float y11, y12, y21, y22;
         Vector pos11, pos12, pos21, pos22;
+        TextureCoordinate tex11, tex12, tex21, tex22;
 
         Color color(0.6, 0.24, 0.3);
 
@@ -156,11 +154,15 @@ namespace VkRenderer {
                 pos21 = Vector(cosf(phi_next) * cosf(theta), sinf(phi_next), cosf(phi_next) * sinf(theta)) * radius;
                 pos22 = Vector(cosf(phi_next) * cosf(theta_next), sinf(phi_next), cosf(phi_next) * sinf(theta_next)) *
                         radius;
+                tex11 = TextureCoordinate(theta, phi);
+                tex12 = TextureCoordinate(theta_next, phi);
+                tex21 = TextureCoordinate(theta, phi_next);
+                tex22 = TextureCoordinate(theta_next, phi_next);
 
                 sphere.addVertex(
                         Vertex(
                                 pos11,
-                                TextureCoordinate(0.0f, 0.0f),
+                                tex11,
                                 color,
                                 pos11,
                                 PhongVariables(pos11)
@@ -170,7 +172,7 @@ namespace VkRenderer {
                 sphere.addVertex(
                         Vertex(
                                 pos12,
-                                TextureCoordinate(0.0f, 0.0f),
+                                tex12,
                                 color,
                                 pos12,
                                 PhongVariables(pos12)
@@ -180,7 +182,7 @@ namespace VkRenderer {
                 sphere.addVertex(
                         Vertex(
                                 pos22,
-                                TextureCoordinate(0.0f, 0.0f),
+                                tex22,
                                 color,
                                 pos22,
                                 PhongVariables(pos22)
@@ -190,7 +192,7 @@ namespace VkRenderer {
                 sphere.addVertex(
                         Vertex(
                                 pos11,
-                                TextureCoordinate(0.0f, 0.0f),
+                                tex11,
                                 color,
                                 pos11,
                                 PhongVariables(pos11)
@@ -200,7 +202,7 @@ namespace VkRenderer {
                 sphere.addVertex(
                         Vertex(
                                 pos22,
-                                TextureCoordinate(0.0f, 0.0f),
+                                tex22,
                                 color,
                                 pos22,
                                 PhongVariables(pos22)
@@ -210,7 +212,7 @@ namespace VkRenderer {
                 sphere.addVertex(
                         Vertex(
                                 pos21,
-                                TextureCoordinate(0.0f, 0.0f),
+                                tex21,
                                 color,
                                 pos21,
                                 PhongVariables(pos21)
@@ -230,9 +232,9 @@ namespace VkRenderer {
 
     Vertex interp(const Vertex &v1, const Vertex &v2, float t) {
         Vertex _v;
-        float perspective_inv;
+        float perspective_inv = 1.0f; // TODO:perspective correction needed
         _v.pos = interp(v1.pos, v2.pos, t);
-        perspective_inv = _v.pos.w;
+
         _v.texCoord.u = interp(v1.texCoord.u, v2.texCoord.u, t) * perspective_inv;
         _v.texCoord.v = interp(v1.texCoord.v, v2.texCoord.v, t) * perspective_inv;
         _v.color = interp(v1.color, v2.color, t) * perspective_inv;

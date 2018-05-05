@@ -10,14 +10,15 @@
 #include <string>
 #include "MathUtility.h"
 #include "Camera.h"
+#include "TextureLoader/Texture.h"
 
 using namespace std;
 
 namespace VkRenderer {
 #define DRAW_FACES 1
 #define DRAW_BORDERS 2
-#define DRAW_DEPTH 3
-#define FACE_CULLING 4
+#define DRAW_TEXTURE 4
+#define FACE_CULLING 1
 
     typedef float VkFloat;
     typedef uint VkUint;
@@ -34,12 +35,12 @@ namespace VkRenderer {
         GLFWwindow *window;
         Color backgroundColor;
 
-
     public:
         unsigned char *framebuffer;
         Camera *camera;
         VkModeCode drawMode;
         VkModeCode optimizationMode;
+        Image::Texture *currentTexture;
 
         explicit VirtualDevice(const string &name, VkUint width = 1, VkUint height = 1);
         // todo deep-copy
@@ -61,6 +62,8 @@ namespace VkRenderer {
         void setDrawMode(VkModeCode modeCode, bool enabled);
 
         void setOptimization(VkModeCode modeCode, bool enabled);
+
+        void bindTexture(Image::Texture *texture);
 
         void drawPixel(int x, int y, Color color);
 

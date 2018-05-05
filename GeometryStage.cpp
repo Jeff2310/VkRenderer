@@ -14,7 +14,7 @@ namespace VkRenderer {
         v->x *= inv;
         v->y *= inv;
         v->z *= inv;
-        v->w = inv; // 保存1/a, 用于顶点属性（除z之外会受透视影响的属性、纹理坐标、颜色等）的透视矫正插值
+        v->w = inv; // 保存1/z, 用于顶点属性（除z之外会受透视影响的属性、纹理坐标、颜色等）的透视矫正插值
     }
 
     void toViewport(VirtualDevice &device, Vector *v) {

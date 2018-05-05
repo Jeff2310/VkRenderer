@@ -79,11 +79,15 @@ namespace VkRenderer {
             optimizationMode &= ~modeCode;
     }
 
+    void VirtualDevice::bindTexture(Image::Texture *texture) {
+        currentTexture = texture;
+    }
+
     void VirtualDevice::drawPixel(int x, int y, Color color) {
-        framebuffer[(y * width + x) * 4] = (char) lround(color.r * 255);
-        framebuffer[(y * width + x) * 4 + 1] = (char) lround(color.g * 255);
-        framebuffer[(y * width + x) * 4 + 2] = (char) lround(color.b * 255);
-        framebuffer[(y * width + x) * 4 + 3] = (char) lround(color.a * 255);
+        framebuffer[(y * width + x) * 4] = (unsigned char) lround(color.r * 255);
+        framebuffer[(y * width + x) * 4 + 1] = (unsigned char) lround(color.g * 255);
+        framebuffer[(y * width + x) * 4 + 2] = (unsigned char) lround(color.b * 255);
+        framebuffer[(y * width + x) * 4 + 3] = (unsigned char) lround(color.a * 255);
     }
 
     void VirtualDevice::mainLoop() {
@@ -114,5 +118,23 @@ namespace VkRenderer {
         camera->updatePos(x, y, z);
         camera->updateView(pitch, yaw);
         Transform::currentTransform.setView(camera->viewMatrix());
+
+        // set mode
+        if (glfwGetKey(window, GLFW_KEY_Z))
+            setDrawMode(DRAW_BORDERS, true);
+        if (glfwGetKey(window, GLFW_KEY_X))
+            setDrawMode(DRAW_BORDERS, false);
+        if (glfwGetKey(window, GLFW_KEY_C))
+            setDrawMode(DRAW_FACES, true);
+        if (glfwGetKey(window, GLFW_KEY_V))
+            setDrawMode(DRAW_FACES, false);
+        if (glfwGetKey(window, GLFW_KEY_B))
+            setDrawMode(DRAW_TEXTURE, true);
+        if (glfwGetKey(window, GLFW_KEY_N))
+            setDrawMode(DRAW_TEXTURE, false);
+        if (glfwGetKey(window, GLFW_KEY_T))
+            setOptimization(FACE_CULLING, true);
+        if (glfwGetKey(window, GLFW_KEY_Y))
+            setOptimization(FACE_CULLING, false);
     }
 }

@@ -6,14 +6,24 @@
 #define VKSOFTWARERENDER_TEXTURE_H
 
 namespace Image {
+#define SAMPLE_FILTER_NEAREST 1
+#define SAMPLE_FILTER_LINEAR 2
+
+#define CUBIC_TEXTURE 1
+#define SPHERE_TEXTURE 2
+
+    typedef unsigned char Color;
+    typedef unsigned char TypeMode;
     class Texture {
     private:
         unsigned int width, height;
-//        unsigned char *image;
+        Color *image;
+        TypeMode sampleMode;
+        TypeMode textureType;
     public:
         friend class TextureLoader;
 
-        Texture();
+        Texture(TypeMode textureMode, TypeMode sampleMode = SAMPLE_FILTER_NEAREST);
 
         ~Texture();
 
@@ -21,7 +31,9 @@ namespace Image {
 
         unsigned int getHeight();
 
-        unsigned char *image;
+        void sample(float u, float v, void *colors);
+
+        void projection(float *u, float *v);
     };
 }
 

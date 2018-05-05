@@ -106,14 +106,17 @@ namespace VkRenderer {
         for (int x = left - 1; x <= right + 1; x++) {
             // 两边扩展一下，缓解三角形连接处接不上的问题
             if (x < 0 || x > screenWidth) continue;
-            if (left == right)
+            if (left == right || x < left)
                 k = 0.0f;
+            else if (x > right)
+                k = 1.0f;
             else
                 k = (float) (x - left) / (right - left);
             // 扫描线两端定点插值得到fragment
             fragment = interp(scanline.lvertex, scanline.rvertex, k);
-            Vector eyePos = Transform::currentTransform.toWorld(device.camera->pos());
-            Color phongColor = PhongFragment(fragment, eyePos, normalPhongConstants);
+            // fragment shading
+//            Vector eyePos = Transform::currentTransform.toWorld(device.camera->pos());
+            Color phongColor = PhongFragment(device, fragment, normalPhongConstants);
             RasterizePixel(device, x, scanline.y, fragment.pos.z, phongColor);
         }
     }
@@ -126,7 +129,6 @@ namespace VkRenderer {
         } else {
             for (int i = 0; i < count; i++) {
                 // 1为平顶三角形， 2为平底三角形
-
 #pragma omp parallel for
                 for (auto y = (int) lround(result[i].bottom); y <= (int) lround(result[i].top); y++) {
                     if (y < 0 || y > device.getHeight()) continue;// damn it

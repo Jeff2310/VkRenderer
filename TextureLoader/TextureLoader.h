@@ -22,7 +22,6 @@ namespace Image {
         ~TextureLoader();
 
         void loadTextureChar(Texture *texture, const char *path, ImageFormat imageFormat, PixelFormat pixelFormat);
-
     };
 }
 

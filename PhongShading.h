@@ -16,6 +16,6 @@ namespace VkRenderer {
 
     void PhongVertex(Vertex *v);
 
-    Color PhongFragment(const Vertex &frag, const Vector &eyePos, PhongConstants variables);
+    Color PhongFragment(VirtualDevice &device, const Vertex &frag, PhongConstants variables);
 }
 #endif //VKSOFTWARERENDER_PHONGSHADING_H

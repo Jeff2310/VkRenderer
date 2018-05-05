@@ -188,7 +188,7 @@ namespace VkRenderer {
         }
 
         Color operator*(float t) const {
-            Color _c(r * t, g * t, b * t, a);
+            Color _c(r * t, g * t, b * t, a * t);
             return _c;
         }
     };
