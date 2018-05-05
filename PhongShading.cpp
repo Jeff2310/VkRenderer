@@ -17,9 +17,9 @@ namespace VkRenderer {
         Transform &transform = Transform::currentTransform;
         Matrix model = Transform::currentTransform.getModel();
         // mat3(transpose(inverse(model)))
-        Matrix normalTransform = model.transpose() * model.inverse();
-        normalTransform.value[3][0] = normalTransform.value[3][1] = normalTransform.value[3][2] = 0.0f;
-        normalTransform.value[3][3] = 1.0f;
+        Matrix normalTransform = model.inverse().transpose();
+//        normalTransform.value[3][0] = normalTransform.value[3][1] = normalTransform.value[3][2] = 0.0f;
+//        normalTransform.value[3][3] = 1.0f;
 
         v->shaderVariables.fragPos = transform.toWorld(v->pos);
 

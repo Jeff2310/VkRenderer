@@ -103,7 +103,7 @@ namespace VkRenderer {
         Vertex fragment;
         float k;
 #pragma omp parallel for
-        for (int x = left - 1; x <= right + 1; x++) {
+        for (int x = left - 1; x <= right; x++) {
             // 两边扩展一下，缓解三角形连接处接不上的问题
             if (x < 0 || x > screenWidth) continue;
             if (left == right || x < left)

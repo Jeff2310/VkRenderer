@@ -119,6 +119,13 @@ namespace VkRenderer {
         camera->updateView(pitch, yaw);
         Transform::currentTransform.setView(camera->viewMatrix());
 
+        if (glfwGetKey(window, GLFW_KEY_O))
+            Transform::currentTransform.setModel(
+                    rotate(2.0f, Vector(0.0f, 1.0f, 0.0f)) * Transform::currentTransform.getModel());
+        if (glfwGetKey(window, GLFW_KEY_P))
+            Transform::currentTransform.setModel(
+                    rotate(-2.0f, Vector(0.0f, 1.0f, 0.0f)) * Transform::currentTransform.getModel());
+
         // set mode
         if (glfwGetKey(window, GLFW_KEY_Z))
             setDrawMode(DRAW_BORDERS, true);

@@ -139,8 +139,8 @@ namespace VkRenderer {
     Matrix getView(const Vector &eyePos, const Vector &direction, const Vector &up) {
         Matrix _m;
         Vector _back = direction.normalize() * -1.0f;
-        Vector _right = up.normalize().cross(_back);
-        Vector _up = _back.cross(_right);
+        Vector _right = up.cross(_back).normalize();
+        Vector _up = _back.cross(_right).normalize();
         _m.value[0][0] = _right.x;
         _m.value[0][1] = _right.y;
         _m.value[0][2] = _right.z;
@@ -167,7 +167,7 @@ namespace VkRenderer {
     }
 
     Matrix getPerspective(float fov, float aspect, float near, float far) {
-        // 2*n/h
+        // 2ndh ==> 2*n/h
         float _2ndh = 1 / tanf(fov * 0.5f);
         Matrix _m;
         _m.value[0][0] = _2ndh / aspect;

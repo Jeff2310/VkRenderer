@@ -5,6 +5,9 @@
 #include "MathUtility.h"
 #include "Rasterisation.h"
 #include "PhongShading.h"
+#include <iostream>
+
+using namespace std;
 
 namespace VkRenderer {
 
@@ -49,7 +52,6 @@ namespace VkRenderer {
         toViewport(device, &_p1.pos);
         toViewport(device, &_p2.pos);
         toViewport(device, &_p3.pos);
-
 
         Triangle _t{_p1, _p2, _p3};
 
