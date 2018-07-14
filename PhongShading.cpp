@@ -10,7 +10,7 @@
 
 namespace VkRenderer {
 
-    PhongConstants normalPhongConstants = PhongConstants(0.2f, 0.6f, 0.5f, 32, Vector(0.5f, 0.5f, 0.5f),
+    PhongConstants normalPhongConstants = PhongConstants(0.2f, 0.6f, 0.5f, 16, Vector(1.0f, 1.0f, 1.0f),
                                                          Color(1.0f, 1.0f, 1.0f));
 
     void PhongVertex(Vertex *v) {
@@ -18,8 +18,6 @@ namespace VkRenderer {
         Matrix model = Transform::currentTransform.getModel();
         // mat3(transpose(inverse(model)))
         Matrix normalTransform = model.inverse().transpose();
-//        normalTransform.value[3][0] = normalTransform.value[3][1] = normalTransform.value[3][2] = 0.0f;
-//        normalTransform.value[3][3] = 1.0f;
 
         v->shaderVariables.fragPos = transform.toWorld(v->pos);
 
@@ -51,15 +49,15 @@ namespace VkRenderer {
 
         Vector lightDir = (variables.lightPos - frag.shaderVariables.fragPos).normalize();
         // no view and reflect in blinn-phong model
-        // Vector viewDir = (eyePos - frag.shaderVariables.fragPos).normalize();
-        // Vector reflectDir = reflect(lightDir, norm);
+//        Vector viewDir = (device.camera->pos() - frag.shaderVariables.fragPos).normalize();
+//        Vector reflectDir = reflect(lightDir, norm);
         Vector halfDir = (norm + lightDir).normalize();
 
         float ambient = variables.ambient;
 
         float diffuse = variables.diffuse * max(norm.dot(lightDir), 0.0f);
         // phong
-        //float specular = variables.specular * powf(max(viewDir.dot(reflectDir), 0.0f), variables.shiniess);
+//        float specular = variables.specular * powf(max(viewDir.dot(reflectDir), 0.0f), variables.shiniess);
         // blinn-phong
         float specular = variables.specular * powf(max(norm.dot(halfDir), 0.0f), variables.shiniess);
 

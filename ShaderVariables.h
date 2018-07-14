@@ -17,7 +17,7 @@ namespace VkRenderer {
         Vector lightPos;
         const Color lightColor;
 
-        PhongConstants() : ambient(1.0f), diffuse(1.0f), specular(1.0f), shiniess(32), lightPos(),
+        PhongConstants() : ambient(1.0f), diffuse(1.0f), specular(1.0f), shiniess(16), lightPos(),
                            lightColor() {}
 
         PhongConstants(float _ambient, float _diffuse, float _specular, int _shiniess, const Vector &_lightPos,
@@ -36,9 +36,9 @@ namespace VkRenderer {
         PhongVariables(Vector _pos) : fragPos(_pos) {}
 
         static PhongVariables
-        variablesInterp(const PhongVariables &v1, const PhongVariables &v2, float t, float perspective_inv) {
+        variablesInterp(const PhongVariables &v1, const PhongVariables &v2, float world_t) {
             PhongVariables v;
-            v.fragPos = interp(v1.fragPos, v2.fragPos, t) * perspective_inv;
+            v.fragPos = interp(v1.fragPos, v2.fragPos, world_t);
             return v;
         }
     };

@@ -21,7 +21,7 @@ int main() {
     };
 
     Mesh cube = createCube(1.0f, colors);
-    Mesh sphere = createSphere(0.5f, 10.0f);
+    Mesh sphere = createSphere(0.5f, 15.0f);
 
     device.setBackgroundColor(0.3f, 0.58f, 0.80f);
     Transform::currentTransform.setView(

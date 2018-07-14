@@ -64,7 +64,8 @@ namespace VkRenderer {
     Vector interp(const Vector &v1, const Vector &v2, float t) {
         Vector _v(interp(v1.x, v2.x, t),
                   interp(v1.y, v2.y, t),
-                  interp(v1.z, v2.z, t));
+                  interp(v1.z, v2.z, t),
+                  interp(v1.w, v2.w, t));
         return _v;
     }
 

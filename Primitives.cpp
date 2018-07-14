@@ -232,16 +232,23 @@ namespace VkRenderer {
 
     Vertex interp(const Vertex &v1, const Vertex &v2, float t) {
         Vertex _v;
-        float perspective_inv = 1.0f; // TODO:perspective correction needed
         _v.pos = interp(v1.pos, v2.pos, t);
+        float z_inv = _v.pos.w;
+        float t2;
+        float z1 = 1 / v1.pos.w, z2 = 1 / v2.pos.w;
+        if (z1 < z2 + 0.0001f && z1 > z2 - 0.0001f)
+            t2 = t;
+        else
+            t2 = (1 / z_inv - 1 / v1.pos.w) / (1 / v2.pos.w - 1 / v1.pos.w);
+        //t2 = t;
+//        printf("%.3f <> %.3f \n", t, t2);
+        _v.texCoord.u = interp(v1.texCoord.u, v2.texCoord.u, t2);
+        _v.texCoord.v = interp(v1.texCoord.v, v2.texCoord.v, t2);
+        _v.color = interp(v1.color, v2.color, t2);
+        _v.normal = interp(v1.normal, v2.normal, t2); // TODO: normal interpolate needed
 
-        _v.texCoord.u = interp(v1.texCoord.u, v2.texCoord.u, t) * perspective_inv;
-        _v.texCoord.v = interp(v1.texCoord.v, v2.texCoord.v, t) * perspective_inv;
-        _v.color = interp(v1.color, v2.color, t) * perspective_inv;
-        _v.normal = interp(v1.normal, v2.normal, t); // TODO: normal interpolate needed
-
-        _v.shaderVariables = PhongVariables::variablesInterp(v1.shaderVariables, v2.shaderVariables, t,
-                                                             perspective_inv);
+        _v.shaderVariables = PhongVariables::variablesInterp(v1.shaderVariables, v2.shaderVariables,
+                                                             t);
         return _v;
     }
 }
